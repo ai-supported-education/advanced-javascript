@@ -1,0 +1,10 @@
+diff --git a/modules/01-objects-and-prototypes/sessions/01-03/exercise.js b/modules/01-objects-and-prototypes/sessions/01-03/exercise.js
+--- a/modules/01-objects-and-prototypes/sessions/01-03/exercise.js
++++ b/modules/01-objects-and-prototypes/sessions/01-03/exercise.js
+@@ -13,5 +13,5 @@ export function manualNew(Constructor, args = []) {
+   const receiver = Object.create(prototype);
+   const returned = Constructor.apply(receiver, args);
+ 
+-  return receiver;
++  return returned ?? receiver;
+ }

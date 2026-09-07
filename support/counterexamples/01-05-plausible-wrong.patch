@@ -1,0 +1,12 @@
+diff --git a/modules/01-objects-and-prototypes/sessions/01-05/exercise.js b/modules/01-objects-and-prototypes/sessions/01-05/exercise.js
+--- a/modules/01-objects-and-prototypes/sessions/01-05/exercise.js
++++ b/modules/01-objects-and-prototypes/sessions/01-05/exercise.js
+@@ -6,7 +6,7 @@ const DEFAULT_PREFERENCES = {
+ export function mergePreferences(input) {
+   const result = { ...DEFAULT_PREFERENCES };
+ 
+-  for (const key in input) {
++  for (const key of Object.keys(input)) {
+     result[key] = input[key];
+   }
+ 

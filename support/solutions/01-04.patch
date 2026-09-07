@@ -1,0 +1,12 @@
+diff --git a/modules/01-objects-and-prototypes/sessions/01-04/exercise.js b/modules/01-objects-and-prototypes/sessions/01-04/exercise.js
+--- a/modules/01-objects-and-prototypes/sessions/01-04/exercise.js
++++ b/modules/01-objects-and-prototypes/sessions/01-04/exercise.js
+@@ -5,7 +5,7 @@ export class Counter {
+   }
+ }
+ 
+-Counter.prototype.increment = () => {
++Counter.prototype.increment = function () {
+   this.value += 1;
+   return this.value;
+ };

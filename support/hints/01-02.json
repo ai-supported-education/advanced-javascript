@@ -1,0 +1,16 @@
+{
+  "levels": [
+    {
+      "title": "Контракт одного свойства",
+      "body": "Не защищайте весь объект. Сопоставьте каждое требование id с отдельным флагом data descriptor: запись, перечисление и возможность удаления."
+    },
+    {
+      "title": "Сравните id и title",
+      "body": "title может остаться обычным свойством literal. Для id нужен собственный descriptor: значение должно копироваться через spread, но Reflect.set и Reflect.deleteProperty должны сообщать отказ."
+    },
+    {
+      "title": "Форма исправления",
+      "body": "Сначала создайте record с изменяемым title, затем вызовите Object.defineProperty(record, \"id\", { value: id, ... }). Явно задайте writable, enumerable и configurable по требованиям и верните record."
+    }
+  ]
+}

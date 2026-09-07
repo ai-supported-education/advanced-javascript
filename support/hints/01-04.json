@@ -1,0 +1,16 @@
+{
+  "levels": [
+    {
+      "title": "Где берётся this",
+      "body": "Положение функции в Counter.prototype обеспечивает общий lookup, но не создаёт receiver для стрелки. Сравните правила this у arrow function и обычной function."
+    },
+    {
+      "title": "Сохраните место хранения",
+      "body": "Не переносите increment в constructor и не привязывайте его bind. Измените только вид функции справа от Counter.prototype.increment, чтобы this выбирался формой вызова."
+    },
+    {
+      "title": "Форма исправления",
+      "body": "Определите Counter.prototype.increment как обычную function, внутри увеличьте this.value и верните его. Тогда first.increment() и .call(receiver) передадут разные receivers одной общей функции."
+    }
+  ]
+}

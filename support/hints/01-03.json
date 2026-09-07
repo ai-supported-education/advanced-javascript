@@ -1,0 +1,16 @@
+{
+  "levels": [
+    {
+      "title": "Последний шаг new",
+      "body": "Constructor уже вызван с receiver. Осталось решить, может ли явно возвращённое значение заменить receiver: правило зависит от категории значения, а не от truthiness."
+    },
+    {
+      "title": "Используйте готовую границу",
+      "body": "В starter уже есть isObjectValue. Проверьте, какие значения она принимает: object кроме null и function. Именно эта граница нужна для выбора результата."
+    },
+    {
+      "title": "Форма исправления",
+      "body": "Финальный return должен выбирать returned, когда isObjectValue(returned) истинно, и receiver во всех остальных случаях. Не копируйте returned и не вызывайте new или Reflect.construct."
+    }
+  ]
+}

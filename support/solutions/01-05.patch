@@ -1,0 +1,17 @@
+diff --git a/modules/01-objects-and-prototypes/sessions/01-05/exercise.js b/modules/01-objects-and-prototypes/sessions/01-05/exercise.js
+--- a/modules/01-objects-and-prototypes/sessions/01-05/exercise.js
++++ b/modules/01-objects-and-prototypes/sessions/01-05/exercise.js
+@@ -6,8 +6,11 @@ const DEFAULT_PREFERENCES = {
+ export function mergePreferences(input) {
+   const result = { ...DEFAULT_PREFERENCES };
+ 
+-  for (const key in input) {
+-    result[key] = input[key];
++  const allowed = new Set(["theme", "pageSize"]);
++  for (const key of Object.keys(input)) {
++    if (allowed.has(key)) {
++      result[key] = input[key];
++    }
+   }
+ 
+   return result;
