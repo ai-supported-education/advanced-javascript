@@ -1,0 +1,155 @@
+# Правила работы Codex в учебном репозитории
+
+## Режим прохождения
+
+Scope активной сессии задают её `README.md`, `DONE` и `rubric.md`.
+
+- Не изменяйте решение во время review.
+- Не расширяйте обязательный scope соседними рефакторингами.
+- Не открывайте следующую сессию до `pnpm session:finish`.
+- Не показывайте правильные ответы quiz до явного запроса `rescue level 3`.
+- Не применяйте reference solution автоматически.
+
+## Review
+
+1. Выполните `pnpm session:check`.
+2. Получите пакет через `pnpm session:review`.
+3. Проверьте только условия текущей карточки.
+4. Верните `PASS` или `NEEDS_WORK` с доказательствами.
+5. Запишите verdict командой `pnpm session:review --record PASS` или
+   `NEEDS_WORK` только после фактической проверки.
+
+`PASS` означает, что выполнены все обязательные критерии. Неблокирующие идеи
+перечисляются отдельно и не мешают завершить сессию.
+
+## Подсказки
+
+Подсказки выдаются по одной командой `pnpm session:hint`. Команда определяет
+следующий уровень по локальному progress; не извлекайте следующие уровни из Git ref
+`course-support` без явного запроса пользователя.
+
+## Режим разработки курса
+
+Когда пользователь просит менять сам тренажёр, разрешены обычные изменения кода и
+документации. Сначала прочитайте `curriculum/authoring-standard.md`, затем
+[`docs/learner-facing-language.md`](docs/learner-facing-language.md), после этого —
+каждый profile из `curriculum/course.json`: общий profile находится в
+`docs/course-profiles/<id>.md`, стековый — в `docs/stack-profiles/<id>.md`. Не
+переносите профильные правила в курс, где profile не выбран.
+
+Learner-facing маршрут вводит тему на трёх уровнях: корневой README объясняет
+стартовую проблему и путь курса, README module связывает главу с предыдущим
+результатом, README карточки до outcome даёт опору, затруднение и вопрос текущей
+практики. Пишите естественным русским голосом спокойного наставника: конкретное
+наблюдение предшествует термину, точное имя вводится вместе с понятным объяснением,
+а будущая сложность явно откладывается. Не заменяйте эту проверку единым шаблоном
+вступления, обязательной метафорой или механическим подсчётом слов и англицизмов.
+
+В опубликованных корневом README, README module и README карточки отметьте конец
+этого входа комментарием `<!-- content-review:opening:end -->`. До маркера каждая
+ссылка вроде «такой», «этот», «похожий» или «здесь» имеет однозначный уже названный
+объект. Каждый центральный identifier и API первого code block объявлен либо
+объяснён до использования. «Можно догадаться по имени» не считается объяснением,
+а поздний раздел не исправляет first-contact задним числом. Первый пример нового
+API показывает начальное состояние, событие, роли значимых имён и наблюдаемый
+результат. Это проверка смысла, а не механический запрет отдельных слов.
+
+Каждая карточка обязана назвать создаваемый evidence и способ его проверки. Не
+выдавайте ожидаемый результат за наблюдавшийся, не придумывайте измерения, логи,
+источники или факт успешного запуска. В тексте различайте:
+
+- факт из источника;
+- принятое допущение;
+- ожидаемый результат;
+- фактическое наблюдение;
+- вывод из наблюдений.
+
+Для действий с сетью, радиоэфиром, оборудованием или внешними сервисами используйте
+только явно разрешённый scope. Предпочитайте симуляцию, localhost и пассивное
+наблюдение. До практики должны быть preflight и stop conditions, после неё —
+cleanup/rollback; отсутствие этих границ блокирует публикацию.
+
+Если карточка является code exercise, starter должен сохранять целевую ошибку, а
+acceptance test обязан:
+
+- падать на starter по ожидаемой причине;
+- проходить после минимального корректного решения;
+- проверять наблюдаемое пользовательское поведение, а не внутреннюю реализацию.
+
+Для расчёта, измерения, диагностики или design-задачи не имитируйте code starter:
+используйте соответствующий шаблон из `templates/sessions/` и проверяйте именно
+заявленный artifact. Rubric разделяет обязательные invariants, допустимые варианты
+решения и необязательные улучшения.
+
+Соблюдайте `curriculum/authoring-standard.md`. Стековые архитектурные правила не
+переносятся между курсами автоматически: подключайте только профиль нужного стека.
+
+До генерации learner-facing карточек подготовьте реальную идентичность курса,
+корневой learner README и полный manifest, затем выполните обязательный
+roadmap-review: `pnpm author:roadmap-review`. Curriculum-agent и subject-agent
+запускаются независимо с `fork_turns="none"`, получают только свой packet и не
+видят историю генерации либо отчёт другого reviewer. После исправлений каждая
+помеченная `STALE` стадия повторяется новым агентом, затем записывается schema v3
+roadmap attestation.
+
+После генерации или существенного изменения learner-facing материала выполните
+обязательный independent content-review тремя независимыми агентами:
+
+1. Соберите packet через `pnpm author:content-review session <id>`.
+2. Запустите novice-subagent с `fork_turns="none"`. Сначала передайте только путь
+   к `00-novice.md`; агент не открывает repository или другие packets и возвращает
+   отдельный first-contact checkpoint по opening. Физически сохраните checkpoint в
+   `.authoring/content-review/checkpoints/<scope>-<id>-novice-opening.md`.
+   Для later session packet содержит краткие outcomes и DONE всех уже пройденных
+   published-карточек. В module packet результат каждой опубликованной карточки
+   появляется сразу после её opening и служит контекстом только для следующих
+   openings; им нельзя ретроспективно исправлять вход той же карточки. Не считайте
+   анонс примера в course/module roadmap первым
+   объясняющим примером нового API: полную причинную цепочку требуйте там, где
+   пример действительно используется как доказательство.
+   Только при `CLEAR` продолжите тот же диалог и передайте агенту `01-blind.md`:
+   теперь он проходит весь learner-facing материал до DONE и возвращает итоговый
+   `PASS` или `NEEDS_REWRITE`. Поздний текст не позволяет смягчить уже сохранённые
+   first-contact findings.
+3. Независимо запустите subject-subagent с `fork_turns="none"`. Он получает только
+   subject packet, проверяет предметные утверждения и currentness по первичным
+   источникам из `source-ledger.json`, различает ECMAScript, host API, runtime и
+   toolchain и помечает собственные inference.
+4. Независимо запустите consistency-subagent с `fork_turns="none"`. Он не получает
+   novice checkpoint или report. Передайте ему `01-blind.md`, дождитесь письменной
+   реконструкции материала и только затем откройте `02-consistency.md` для сверки
+   rubric, tests, evidence, profiles и соседних карточек. Для prerequisites он
+   использует provenance-карту и learner sources из 02, а не предполагает, что
+   любой concept обязан быть введён непосредственно в предыдущей карточке.
+5. Не передавайте агентам историю генерации, авторские рассуждения, hints,
+   solution или отчёт другого reviewer. Quiz key может находиться только в
+   `02-consistency.md` как acceptance evidence. Все reviewers работают read-only и
+   возвращают `PASS` или `NEEDS_REWRITE`.
+6. Запишите три фактических verdict отдельными командами:
+   `pnpm author:content-review --record subject <session|module> <id> PASS|NEEDS_REWRITE --report <path>`,
+   `pnpm author:content-review --record novice <session|module> <id> PASS|NEEDS_REWRITE --report <path>`
+   и
+   `pnpm author:content-review --record consistency <session|module> <id> PASS|NEEDS_REWRITE --report <path>`.
+7. После исправлений повторите все проверки новыми fresh subagents. Нельзя
+   продолжать прежний novice checkpoint или прежний consistency reconstruction.
+   Позднее объяснение не понижает finding неизвестного центрального identifier во
+   opening.
+
+До content-review каждой published session с `typecheck`, `unit`, `integration`
+или `browser` выполните `pnpm author:proof <id>`. Эта команда
+обязана наблюдать целевое падение starter, PASS минимального solution patch и
+падение хотя бы одного правдоподобного counterexample на одной acceptance test.
+
+После тройного session PASS всех карточек выполните
+`pnpm author:content-review module <id>` и получите три независимых module PASS.
+После них запишите публичную аттестацию командой
+`pnpm author:content-review attest <session|module> <id>`. Без актуальных session и
+module PASS материал не считается готовым к публикации.
+
+`planned` содержит только roadmap и не проходит content-review. Полный контракт
+сначала переводится в `published` в authoring feature branch, где появляются
+learner files и выполняется review; default branch получает его только вместе с
+актуальными attestations. `pnpm author:publication-check` — финальный обязательный
+gate и проверяет roadmap, session/module attestations, toolchain hashes и author
+proofs. Module review покрывает текущий published prefix; после
+публикации следующей карточки он повторяется для расширенного prefix.
