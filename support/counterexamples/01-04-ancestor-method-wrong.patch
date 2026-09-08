@@ -1,0 +1,17 @@
+diff --git a/modules/01-objects-and-prototypes/sessions/01-04/exercise.js b/modules/01-objects-and-prototypes/sessions/01-04/exercise.js
+--- a/modules/01-objects-and-prototypes/sessions/01-04/exercise.js
++++ b/modules/01-objects-and-prototypes/sessions/01-04/exercise.js
+@@ -5,7 +5,10 @@ export class Counter {
+   }
+ }
+ 
+-Counter.prototype.increment = () => {
+-  this.value += 1;
+-  return this.value;
++const sharedCounterMethods = {
++  increment() {
++    this.value += 1;
++    return this.value;
++  }
+ };
++Object.setPrototypeOf(Counter.prototype, sharedCounterMethods);
