@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 3,
+  "scope": "roadmap",
+  "id": "course",
+  "verdict": "PASS",
+  "attestedAt": "2026-09-08T05:30:03.045Z",
+  "hashes": {
+    "curriculum": "e7b17cbd27a4f63a3b6f5665593774bf7a48e579fe1c178e2dc33a00e43bb11c",
+    "subject": "10b00255f19404b35f0177131b8338251d5b5262b516ad7650e25da3f49c3580"
+  },
+  "reviews": {
+    "curriculum": {
+      "verdict": "PASS",
+      "reviewedAt": "2026-09-07T23:09:15.950Z",
+      "reportSha256": "538b7ca243dab1a72291eb85678fda1c58c6d77ba3d7abcf6922f8bc791c9544"
+    },
+    "subject": {
+      "verdict": "PASS",
+      "reviewedAt": "2026-09-08T05:30:02.281Z",
+      "reportSha256": "d19b6f1427dc9a75b088a099d24df992bec0238cce939ef928a06d27924da3f0"
+    }
+  },
+  "protocol": "roadmap-subject-novice-consistency-v1"
+}

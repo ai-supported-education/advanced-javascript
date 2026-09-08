@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 3,
+  "scope": "module",
+  "id": "01",
+  "contentHash": "ddf164d2b4b26d1162a13968d544b04f15ab519e211779ff5141201dc6e721d4",
+  "verdict": "PASS",
+  "attestedAt": "2026-09-08T05:20:16.115Z",
+  "reviews": {
+    "subject": {
+      "verdict": "PASS",
+      "reviewedAt": "2026-09-08T05:08:40.765Z",
+      "reportSha256": "a4cdcae12467df9b7e51a6dc5dce09d3fd5876c839b626c6ae688dcf622bae65"
+    },
+    "novice": {
+      "verdict": "PASS",
+      "reviewedAt": "2026-09-08T04:53:52.589Z",
+      "reportSha256": "fc3de730427cf9c904c3b0c66ecf015d1a8b2d716d2b3cde597742a3db1c0bf1"
+    },
+    "consistency": {
+      "verdict": "PASS",
+      "reviewedAt": "2026-09-08T05:20:15.360Z",
+      "reportSha256": "ac2c5611274f611ce9f51f2229071e948c710f42511e19a2164e3c2a9a5db57b"
+    }
+  },
+  "protocol": "roadmap-subject-novice-consistency-v1"
+}

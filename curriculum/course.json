@@ -2,19 +2,40 @@
   "version": 1,
   "reviewProtocol": "roadmap-subject-novice-consistency-v1",
   "language": "ru",
-  "audience": "{{ опишите входные знания учащегося }}",
-  "profiles": [],
-  "courseContextFiles": [],
+  "audience": "Опытный JS/TS web-разработчик, знакомый с Promise, DOM, Node.js, Git и автоматическими тестами, но не обязанный знать внутренние протоколы языка",
+  "profiles": ["software", "advanced-javascript"],
+  "courseContextFiles": [
+    "curriculum/audience.md",
+    "curriculum/capstone-publication-preflight.md",
+    "curriculum/versioned-evidence.md"
+  ],
   "toolchainFiles": [
     "package.json",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
+    "tsconfig.base.json",
+    "curriculum/probes/playwright-smoke.mjs",
+    "curriculum/probes/rollup-sourcemap/entry.ts",
+    "curriculum/probes/rollup-sourcemap/tsconfig.json",
+    "curriculum/probes/rollup-sourcemap/rollup.config.mjs",
+    "curriculum/probes/rollup-sourcemap/verify.mjs",
+    "packages/session-runner/package.json",
     "packages/session-runner/tsconfig.json"
   ],
-  "assumedConcepts": [],
+  "assumedConcepts": [
+    "javascript-language-basics",
+    "promise-basics",
+    "async-await-basics",
+    "dom-basics",
+    "node-basics",
+    "typescript-basics",
+    "package-manager-basics",
+    "git-basics",
+    "automated-testing-basics"
+  ],
   "estimatedHours": {
-    "min": 1,
-    "max": 1
+    "min": 55,
+    "max": 70
   },
   "sessionPolicy": {
     "minMinutes": 30,
@@ -27,33 +48,602 @@
   "modules": [
     {
       "id": "01",
-      "slug": "replace-me",
-      "title": "Замените демонстрационный раздел",
-      "goal": "Сформулируйте первый измеримый результат будущего курса.",
+      "slug": "objects-and-prototypes",
+      "title": "Объекты и prototype chain",
+      "goal": "По наблюдаемому поведению восстановить путь поиска свойства и безопасно работать с прототипами.",
       "sessions": [
         {
           "id": "01-01",
-          "title": "Замените демонстрационную карточку",
-          "minutes": 30,
+          "title": "Где JavaScript нашёл свойство",
+          "minutes": 40,
           "kind": "observe",
-          "outcome": "Учащийся получает первую реальную завершённую карточку.",
-          "done": "Демонстрационный module заменён автором до публикации курса.",
-          "checks": ["review"],
+          "outcome": "Вы проследите поиск own и inherited properties по конкретной prototype chain и объясните результат каждого чтения.",
+          "releaseStatus": "published",
+          "done": "В observations.md сохранены Node.js 24, прогноз и фактический вывод, в answers.json — результаты и собственные причины; check и agent review зелёные.",
+          "checks": ["quiz", "review"],
           "evidence": {
-            "produces": ["README и rubric первой реальной карточки"],
-            "verifiedBy": ["agent"]
+          "produces": [
+            "Прогноз и сверка наблюдений в observations.md",
+            "Заполненный answers.json с собственными объяснениями lookup"
+          ],
+            "verifiedBy": ["automated", "agent"]
           },
-          "requires": [],
-          "introduces": ["first-real-session"],
-          "defers": []
+          "requires": ["javascript-language-basics"],
+          "introduces": ["property-lookup"],
+          "defers": ["property-descriptors", "prototype-pollution"]
+        },
+        {
+          "id": "01-02",
+          "title": "Descriptor меняет поведение поля",
+          "minutes": 50,
+          "kind": "debug",
+      "outcome": "Вы восстановите descriptor поля и различите boolean-отказ Reflect.* от TypeError прямых операторов в strict ES module.",
+          "releaseStatus": "published",
+      "done": "id перечисляется и сохраняется: Reflect.* возвращают false, прямые операторы бросают TypeError, а exercise.test.js проходит без ослабления проверок.",
+          "checks": ["unit", "review"],
+          "checkTargets": { "unit": "exercise.test.js" },
+          "authorProof": {
+            "check": "unit",
+            "expectedStarterFailure": "does not let a write replace id",
+            "solutionPatch": "solutions/01-02.patch",
+            "counterexamplePatches": [
+              "counterexamples/01-02-plausible-wrong.patch",
+              "counterexamples/01-02-title-descriptor-wrong.patch"
+            ]
+          },
+          "evidence": {
+            "produces": ["Исправленный exercise.js", "Вывод unit check"],
+            "verifiedBy": ["automated", "agent"]
+          },
+          "requires": ["property-lookup"],
+          "introduces": ["property-descriptors"],
+          "defers": ["class-semantics"]
+        },
+        {
+          "id": "01-03",
+          "title": "Что именно делает new",
+          "minutes": 50,
+          "kind": "complete",
+          "outcome": "Вы допишете вызов constructor function, который связывает новый объект с prototype и учитывает явный object return.",
+          "releaseStatus": "published",
+          "done": "exercise.js воспроизводит наблюдаемый контракт new для обычного и явного object return, а exercise.test.js проходит.",
+          "checks": ["unit", "review"],
+          "checkTargets": { "unit": "exercise.test.js" },
+          "authorProof": {
+            "check": "unit",
+            "expectedStarterFailure": "uses an explicitly returned object without copying it",
+            "solutionPatch": "solutions/01-03.patch",
+            "counterexamplePatches": [
+              "counterexamples/01-03-plausible-wrong.patch",
+              "counterexamples/01-03-cloned-receiver-wrong.patch",
+              "counterexamples/01-03-double-call-wrong.patch"
+            ]
+          },
+          "evidence": {
+            "produces": ["Дополненный exercise.js", "Вывод unit check"],
+            "verifiedBy": ["automated", "agent"]
+          },
+          "requires": ["property-lookup"],
+          "introduces": ["constructor-protocol"],
+          "defers": ["class-semantics"]
+        },
+        {
+          "id": "01-04",
+          "title": "Class поверх prototype chain",
+          "minutes": 50,
+          "kind": "debug",
+          "outcome": "Вы исправите class так, чтобы данные принадлежали экземплярам, а общий метод находился в prototype.",
+          "releaseStatus": "published",
+          "done": "Экземпляры сохраняют независимые данные, Counter.prototype владеет общим методом, сами экземпляры им не владеют, и exercise.test.js проходит.",
+          "checks": ["unit", "review"],
+          "checkTargets": { "unit": "exercise.test.js" },
+          "authorProof": {
+            "check": "unit",
+            "expectedStarterFailure": "keeps state on the receiving instance",
+            "solutionPatch": "solutions/01-04.patch",
+            "counterexamplePatches": [
+              "counterexamples/01-04-plausible-wrong.patch",
+              "counterexamples/01-04-ancestor-method-wrong.patch"
+            ]
+          },
+          "evidence": {
+            "produces": ["Исправленный exercise.js", "Объяснение receiver в notes.md", "Вывод unit check"],
+            "verifiedBy": ["automated", "agent"]
+          },
+          "requires": ["property-lookup", "constructor-protocol"],
+          "introduces": ["class-semantics", "method-receiver"],
+          "defers": ["prototype-pollution"]
+        },
+        {
+          "id": "01-05",
+          "title": "Когда prototype становится уязвимостью",
+          "minutes": 55,
+          "kind": "diagnose",
+          "outcome": "Вы локализуете неконтролируемое копирование ключей и разрешите перенос только собственных theme и pageSize без изменения prototype результата.",
+          "releaseStatus": "published",
+          "done": "Runtime preflight сохранён, копируются только собственные theme и pageSize, неожиданные ключи не меняют prototype результата, а exercise.test.js проходит.",
+          "checks": ["unit", "review"],
+          "checkTargets": { "unit": "exercise.test.js" },
+          "authorProof": {
+            "check": "unit",
+            "expectedStarterFailure": "ignores own keys that may reshape the result prototype",
+            "solutionPatch": "solutions/01-05.patch",
+            "counterexamplePatches": [
+              "counterexamples/01-05-plausible-wrong.patch",
+              "counterexamples/01-05-nonenumerable-wrong.patch",
+              "counterexamples/01-05-mutates-input-wrong.patch"
+            ]
+          },
+          "evidence": {
+            "produces": ["Исправленный exercise.js", "Краткая причина дефекта в diagnosis.md", "Вывод runtime preflight и unit check"],
+            "verifiedBy": ["automated", "agent"]
+          },
+          "requires": ["property-lookup", "property-descriptors"],
+          "introduces": ["prototype-pollution"],
+          "defers": ["proxy-invariants"]
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "slug": "execution-and-functions",
+      "title": "Вызовы, функции и closures",
+      "goal": "Связать вызов функции с execution context, lexical environment, this и временем жизни замыкания.",
+      "sessions": [
+        {
+          "id": "02-01", "title": "Что появляется при вызове функции", "minutes": 45, "kind": "observe",
+          "outcome": "Вы восстановите execution context и доступные bindings для вложенного вызова.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["execution-contexts"], "defers": []
+        },
+        {
+          "id": "02-02", "title": "Lexical environment — не объект со значениями", "minutes": 45, "kind": "observe",
+          "outcome": "Вы отличите binding в lexical environment от свойства обычного объекта.",
+          "releaseStatus": "planned", "requires": ["execution-contexts"], "introduces": ["lexical-environments"], "defers": []
+        },
+        {
+          "id": "02-03", "title": "Closure удерживает binding, а не snapshot", "minutes": 50, "kind": "debug",
+          "outcome": "Вы объясните и исправите closure, которое наблюдает меняющееся значение.",
+          "releaseStatus": "planned", "requires": ["lexical-environments"], "introduces": ["closure-lifetime"], "defers": []
+        },
+        {
+          "id": "02-04", "title": "Откуда берётся this", "minutes": 50, "kind": "observe",
+          "outcome": "Вы предскажете this по форме вызова для method, detached function и arrow function.",
+          "releaseStatus": "planned", "requires": ["execution-contexts", "method-receiver"], "introduces": ["this-binding"], "defers": []
+        },
+        {
+          "id": "02-05", "title": "bind, call и apply без потери контракта", "minutes": 50, "kind": "complete",
+          "outcome": "Вы построите wrapper, который сохраняет this, arguments и конструктивность функции.",
+          "releaseStatus": "planned", "requires": ["closure-lifetime", "this-binding", "constructor-protocol"], "introduces": ["function-wrappers"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "slug": "symbols-reflect-proxy",
+      "title": "Symbols, Reflect и Proxy",
+      "goal": "Использовать метапрограммирование как протокол с invariants, а не как набор магических ловушек.",
+      "sessions": [
+        {
+          "id": "03-01", "title": "Symbol как ключ и точка протокола", "minutes": 45, "kind": "observe",
+          "outcome": "Вы различите уникальный ключ, global registry и well-known symbol.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["symbols"], "defers": []
+        },
+        {
+          "id": "03-02", "title": "Reflect повторяет внутреннюю операцию", "minutes": 45, "kind": "compare",
+          "outcome": "Вы сопоставите Reflect methods с обычным синтаксисом и корректно передадите receiver.",
+          "releaseStatus": "planned", "requires": ["symbols", "property-descriptors", "method-receiver"], "introduces": ["reflect-operations"], "defers": []
+        },
+        {
+          "id": "03-03", "title": "Proxy trap обязан сохранить invariants", "minutes": 55, "kind": "debug",
+          "outcome": "Вы исправите trap, который конфликтует с non-configurable property target.",
+          "releaseStatus": "planned", "requires": ["reflect-operations", "property-descriptors"], "introduces": ["proxy-invariants"], "defers": []
+        },
+        {
+          "id": "03-04", "title": "Revocable proxy как граница доступа", "minutes": 50, "kind": "build",
+          "outcome": "Вы выдадите временный façade через revocable proxy и докажете, что после revoke новые операции через этот proxy прекращаются, не утверждая отзыва исходного target или ранее полученных ссылок.",
+          "releaseStatus": "planned", "requires": ["proxy-invariants"], "introduces": ["revocable-proxies"], "defers": []
+        },
+        {
+          "id": "03-05", "title": "Где метапрограммирование перестаёт быть прозрачным", "minutes": 50, "kind": "diagnose",
+          "outcome": "Вы найдёте наблюдаемые расхождения wrapper, Proxy и исходного объекта и зададите границу применения.",
+          "releaseStatus": "planned", "requires": ["revocable-proxies"], "introduces": ["metaprogramming-boundaries"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "slug": "iterators-and-generators",
+      "title": "Iterators и generators",
+      "goal": "Превратить обход данных в явный ленивый протокол с управляемым завершением.",
+      "sessions": [
+        {
+          "id": "04-01", "title": "Iterable и iterator — две разные роли", "minutes": 45, "kind": "complete",
+          "outcome": "Вы реализуете повторяемый iterable и объясните объект состояния отдельного iterator.",
+          "releaseStatus": "planned", "requires": ["symbols"], "introduces": ["iterator-protocol"], "defers": []
+        },
+        {
+          "id": "04-02", "title": "function* приостанавливает вычисление", "minutes": 50, "kind": "observe",
+          "outcome": "Вы проследите обмен значениями между generator и вызывающим кодом через next и yield.",
+          "releaseStatus": "planned", "requires": ["iterator-protocol", "execution-contexts"], "introduces": ["generator-protocol"], "defers": []
+        },
+        {
+          "id": "04-03", "title": "yield* делегирует протокол", "minutes": 45, "kind": "complete",
+          "outcome": "Вы скомпонуете несколько iterables без промежуточной materialization.",
+          "releaseStatus": "planned", "requires": ["generator-protocol"], "introduces": ["generator-delegation"], "defers": []
+        },
+        {
+          "id": "04-04", "title": "return и throw входят обратно в generator", "minutes": 50, "kind": "debug",
+          "outcome": "Вы обработаете досрочное завершение и ошибку с корректным cleanup.",
+          "releaseStatus": "planned", "requires": ["generator-delegation"], "introduces": ["generator-control"], "defers": []
+        },
+        {
+          "id": "04-05", "title": "Ленивый pipeline не обязан хранить всё", "minutes": 55, "kind": "build",
+          "outcome": "Вы соберёте конечный lazy pipeline и докажете ограниченное потребление входа.",
+          "releaseStatus": "planned", "requires": ["generator-control"], "introduces": ["lazy-pipelines"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "slug": "promises-errors-cancellation",
+      "title": "Promise, ошибки и отмена",
+      "goal": "Проектировать асинхронную операцию с явной моделью settlement, ошибок и срока жизни.",
+      "sessions": [
+        {
+          "id": "05-01", "title": "Promise принимает состояние другого thenable", "minutes": 45, "kind": "observe",
+          "outcome": "Вы отличите resolve от немедленного fulfillment и проследите adoption.",
+          "releaseStatus": "planned", "requires": ["promise-basics"], "introduces": ["promise-resolution"], "defers": ["browser-microtasks", "node-nexttick-microtasks"]
+        },
+        {
+          "id": "05-02", "title": "Ошибка образует асинхронную топологию", "minutes": 50, "kind": "diagnose",
+          "outcome": "Вы сохраните cause и найдёте место, где rejection потерял контекст.",
+          "releaseStatus": "planned", "requires": ["promise-resolution"], "introduces": ["async-error-topology"], "defers": []
+        },
+        {
+          "id": "05-03", "title": "Combinator кодирует политику завершения", "minutes": 50, "kind": "compare",
+          "outcome": "Вы выберете all, allSettled, any или race по требуемому наблюдаемому контракту.",
+          "releaseStatus": "planned", "requires": ["async-error-topology"], "introduces": ["promise-combinators"], "defers": []
+        },
+        {
+          "id": "05-04", "title": "Browser и Node предоставляют совместимый AbortSignal", "minutes": 50, "kind": "compare",
+          "outcome": "Вы проведёте один cancellation fixture через pinned Chromium и Node.js 24 globals, очистите listeners и запишете host каждой трассы.",
+          "releaseStatus": "planned", "requires": ["promise-basics", "dom-basics"], "introduces": ["abort-signals"], "defers": []
+        },
+        {
+          "id": "05-05", "title": "Асинхронная работа имеет владельца", "minutes": 55, "kind": "design",
+          "outcome": "Как design policy поверх Promise и AbortSignal вы зададите lifetime группы задач и докажете отсутствие фонового хвоста после завершения.",
+          "releaseStatus": "planned", "requires": ["abort-signals", "async-await-basics"], "introduces": ["structured-async-lifetime"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "slug": "async-iteration-backpressure",
+      "title": "Async iteration и backpressure",
+      "goal": "Согласовать producer и consumer без неограниченной очереди и потерянной отмены.",
+      "sessions": [
+        {
+          "id": "06-01", "title": "Async iterator обещает следующий шаг", "minutes": 45, "kind": "observe",
+          "outcome": "Вы проследите async iterator protocol и момент запроса следующего элемента.",
+          "releaseStatus": "planned", "requires": ["iterator-protocol", "promise-basics", "async-await-basics"], "introduces": ["async-iterator-protocol"], "defers": []
+        },
+        {
+          "id": "06-02", "title": "Async generator соединяет ожидание и yield", "minutes": 50, "kind": "complete",
+          "outcome": "Вы реализуете async generator с обработкой досрочного завершения consumer.",
+          "releaseStatus": "planned", "requires": ["async-iterator-protocol", "generator-protocol", "async-await-basics"], "introduces": ["async-generators"], "defers": []
+        },
+        {
+          "id": "06-03", "title": "for await управляет завершением iterator", "minutes": 45, "kind": "debug",
+          "outcome": "Вы исправите цикл, который теряет ошибку или cleanup при раннем выходе.",
+          "releaseStatus": "planned", "requires": ["async-generators"], "introduces": ["for-await"], "defers": []
+        },
+        {
+          "id": "06-04", "title": "desiredSize сообщает о backpressure, policy ограничивает очередь", "minutes": 55, "kind": "experiment",
+          "outcome": "В pinned Chromium вы измерите bounded и unbounded producer на одном synthetic ReadableStream и отделите стандартный сигнал desiredSize от выбранного порога policy.",
+          "releaseStatus": "planned", "requires": ["for-await"], "introduces": ["stream-backpressure"], "defers": []
+        },
+        {
+          "id": "06-05", "title": "Node Web Streams pipeline должен отменяться целиком", "minutes": 55, "kind": "integrate",
+          "outcome": "В Node.js 24 Web Streams вы свяжете backpressure, error propagation и AbortSignal и пометите, где заканчивается WHATWG contract и начинается local policy.",
+          "releaseStatus": "planned", "requires": ["stream-backpressure", "abort-signals"], "introduces": ["cancellable-pipelines"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "slug": "collections-binary-unicode",
+      "title": "Collections, binary data и Unicode",
+      "goal": "Выбирать представление данных по identity, lifetime, byte layout и текстовой модели.",
+      "sessions": [
+        {
+          "id": "07-01", "title": "Map и Set сравнивают ключи по SameValueZero", "minutes": 45, "kind": "compare",
+          "outcome": "Вы выберете Object, Map или Set по типу ключей и отличите identity объектов от SameValueZero для primitive values.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["keyed-collections"], "defers": []
+        },
+        {
+          "id": "07-02", "title": "Weak collection не владеет ключом", "minutes": 45, "kind": "design",
+          "outcome": "Вы спроектируете metadata cache без перечисления и обещаний о времени GC.",
+          "releaseStatus": "planned", "requires": ["keyed-collections"], "introduces": ["weak-collections"], "defers": []
+        },
+        {
+          "id": "07-03", "title": "ArrayBuffer хранит bytes, view задаёт чтение", "minutes": 55, "kind": "complete",
+          "outcome": "Вы разберёте бинарный header с явными offset, width и endianness.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["binary-data"], "defers": []
+        },
+        {
+          "id": "07-04", "title": "Одну строку можно сравнивать и резать по-разному", "minutes": 55, "kind": "observe",
+          "outcome": "На одном готовом Unicode fixture вы отделите UTF-16 code units, code points, grapheme segmentation и NFC-сравнение без написания собственного сегментатора; результат сегментации сохраните вместе с точными Node.js, ICU и Unicode versions как host-specific observation.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["unicode-text"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "slug": "memory-and-diagnostics",
+      "title": "Память и диагностика",
+      "goal": "Доказывать, почему объект остаётся достижимым, и находить удерживающую ссылку воспроизводимой процедурой.",
+      "sessions": [
+        {
+          "id": "08-01", "title": "Достижимость важнее области видимости", "minutes": 45, "kind": "observe",
+          "outcome": "Вы построите граф сильных ссылок и назовёте путь от root до объекта.",
+          "releaseStatus": "planned", "requires": ["closure-lifetime"], "introduces": ["reachability"], "defers": []
+        },
+        {
+          "id": "08-02", "title": "Heap snapshot показывает retaining path", "minutes": 55, "kind": "experiment",
+          "outcome": "Вы воспроизведёте локальную утечку и сохраните retaining path до её причины.",
+          "releaseStatus": "planned", "requires": ["reachability", "node-basics"], "introduces": ["heap-snapshots"], "defers": []
+        },
+        {
+          "id": "08-03", "title": "WeakRef не превращает GC в расписание", "minutes": 45, "kind": "diagnose",
+          "outcome": "Вы отделите допустимое применение WeakRef от логики, зависящей от момента finalization.",
+          "releaseStatus": "planned", "requires": ["weak-collections", "reachability"], "introduces": ["weak-references"], "defers": []
+        },
+        {
+          "id": "08-04", "title": "Утечка подтверждается сравнением состояний", "minutes": 60, "kind": "diagnose",
+          "outcome": "Вы локализуете утечку повторными snapshots и подтвердите исправление тем же сценарием.",
+          "releaseStatus": "planned", "requires": ["heap-snapshots", "weak-references"], "introduces": ["leak-diagnostics"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "slug": "workers-and-concurrency",
+      "title": "Workers и concurrency",
+      "goal": "Разделить владение данными между agents и синхронизировать только действительно общую память.",
+      "sessions": [
+        {
+          "id": "09-01", "title": "Browser Worker и node:worker_threads говорят через один протокол", "minutes": 55, "kind": "compare",
+          "outcome": "Вы проведёте один request/response fixture через тонкие browser и Node adapters и отделите общий message protocol от host API.",
+          "releaseStatus": "planned", "requires": ["dom-basics", "node-basics"], "introduces": ["worker-message-passing"], "defers": ["browser-task-queues", "node-event-loop-phases"]
+        },
+        {
+          "id": "09-02", "title": "Structured clone копирует, transfer передаёт владение", "minutes": 50, "kind": "experiment",
+          "outcome": "Через browser и Node worker adapters вы сравните clone и transfer ArrayBuffer по состоянию обеих сторон и сохраните две host traces.",
+          "releaseStatus": "planned", "requires": ["worker-message-passing", "binary-data"], "introduces": ["structured-clone-transfer"], "defers": []
+        },
+        {
+          "id": "09-03", "title": "Atomics задаёт порядок, host решает, где можно ждать", "minutes": 60, "kind": "complete",
+          "outcome": "В Node worker thread вы реализуете handshake на SharedArrayBuffer без busy loop, а в browser-разборе отдельно свяжете ECMAScript memory ordering, host permission на blocking wait и cross-origin-isolation gate для передачи SharedArrayBuffer.",
+          "releaseStatus": "planned", "requires": ["structured-clone-transfer"], "introduces": ["shared-memory-atomics"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "slug": "esm-graph-and-resolution",
+      "title": "ESM-граф и resolution",
+      "goal": "Предсказывать связывание, вычисление и выбор файлов module graph в браузере и Node.js.",
+      "sessions": [
+        {
+          "id": "10-01", "title": "ESM export остаётся live binding", "minutes": 45, "kind": "observe",
+          "outcome": "Вы отличите live binding от snapshot и проследите изменение export.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["esm-live-bindings"], "defers": []
+        },
+        {
+          "id": "10-02", "title": "Цикл разделяет linking и evaluation", "minutes": 55, "kind": "diagnose",
+          "outcome": "Вы локализуете ошибку циклического ESM-графа по порядку linking и evaluation.",
+          "releaseStatus": "planned", "requires": ["esm-live-bindings"], "introduces": ["esm-cycles"], "defers": []
+        },
+        {
+          "id": "10-03", "title": "Браузер разрешает specifier по URL", "minutes": 50, "kind": "configure",
+          "outcome": "Вы соберёте локальный graph с relative URL и import map и объясните каждый resolved URL.",
+          "releaseStatus": "planned", "requires": ["esm-live-bindings", "dom-basics"], "introduces": ["browser-module-resolution"], "defers": []
+        },
+        {
+          "id": "10-04", "title": "Node.js читает exports и imports", "minutes": 55, "kind": "configure",
+          "outcome": "Вы зададите conditional exports и package-local imports alias, закроете deep import через package-name specifier и докажете, почему это public API boundary, а не security encapsulation абсолютного пути.",
+          "releaseStatus": "planned", "requires": ["esm-live-bindings", "node-basics"], "introduces": ["node-package-resolution"], "defers": []
+        },
+        {
+          "id": "10-05", "title": "CJS default export стабилен, named exports эвристичны", "minutes": 55, "kind": "diagnose",
+          "outcome": "При ESM-import конкретного CommonJS fixture вы сопоставите default с module.exports и устраните зависимость от эвристически найденного named export.",
+          "releaseStatus": "planned", "requires": ["node-package-resolution"], "introduces": ["cjs-esm-interop"], "defers": []
+        },
+        {
+          "id": "10-06", "title": "dynamic import создаёт границу загрузки", "minutes": 50, "kind": "build",
+          "outcome": "Вы загрузите optional module по событию и обработаете failure как часть публичного контракта.",
+          "releaseStatus": "planned", "requires": ["esm-live-bindings", "promise-basics"], "introduces": ["dynamic-import-boundaries"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "slug": "building-a-library",
+      "title": "Сборка своей библиотеки",
+      "goal": "Спроектировать package surface, собрать его и проверить из позиции независимого consumer.",
+      "sessions": [
+        {
+          "id": "11-01", "title": "Package contract перечисляет файлы, а не только exports", "minutes": 50, "kind": "design",
+          "outcome": "Вы зададите для каждого entry point исходный erasable .ts, исполняемый ESM .js, .d.ts, sourcemap, export condition и supported runtime без случайных deep imports.",
+          "releaseStatus": "planned", "requires": ["node-package-resolution", "typescript-basics", "package-manager-basics"], "introduces": ["package-contract"], "defers": []
+        },
+        {
+          "id": "11-02", "title": "TypeScript и Rollup делят build pipeline", "minutes": 50, "kind": "configure",
+          "outcome": "Вы настроите двухшаговый CLI pipeline: tsc выпускает в staging промежуточные ESM .js, .d.ts и sourcemaps, локальный Rollup load hook читает .js с соседней .js.map, а повторяемая build-команда создаёт runtime, types и map artifacts и очищает staging.",
+          "releaseStatus": "planned", "requires": ["package-contract"], "introduces": ["rollup-build"], "defers": []
+        },
+        {
+          "id": "11-03", "title": "Sourcemap должна пережить два шага сборки", "minutes": 50, "kind": "diagnose",
+          "outcome": "На готовых fixture вы трассируете строку final bundle к исходному .ts и сохраните согласованные evidence из trace mapper, Node stack и browser DevTools без изменения build pipeline.",
+          "releaseStatus": "planned", "requires": ["rollup-build"], "introduces": ["source-map-fidelity"], "defers": []
+        },
+        {
+          "id": "11-04", "title": "Tree shaking зависит от наблюдаемого side effect", "minutes": 50, "kind": "experiment",
+          "outcome": "Вы сравните два bundle и найдёте причину, по которой неиспользуемый export остался.",
+          "releaseStatus": "planned", "requires": ["rollup-build"], "introduces": ["tree-shaking"], "defers": []
+        },
+        {
+          "id": "11-05", "title": "Проверять нужно упакованный tarball", "minutes": 60, "kind": "integrate",
+          "outcome": "Вы установите artifact от pnpm 10 pack в ESM runtime и TypeScript consumer fixtures и проверите import и types каждого advertised entry point.",
+          "releaseStatus": "planned", "requires": ["package-contract", "rollup-build", "source-map-fidelity", "automated-testing-basics"], "introduces": ["packed-consumer-testing"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "slug": "ecmascript-2023-2026",
+      "title": "ECMAScript 2023–2026",
+      "goal": "Оценивать новое средство по статусу стандарта, поддержке runtime, types и реальной пользе для контракта.",
+      "sessions": [
+        {
+          "id": "12-01", "title": "toSorted, Object.groupBy и Set methods заменяют три ручных обхода", "minutes": 50, "kind": "compare",
+          "outcome": "На трёх готовых fixtures вы сравните новые immutable array, grouping и set operations с их прежними эквивалентами и зафиксируете edition каждой возможности.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics", "keyed-collections"], "introduces": ["recent-builtins-2023-2026"], "defers": ["proposal-lifecycle", "feature-availability-matrix"]
+        },
+        {
+          "id": "12-02", "title": "Stage proposal — ещё не runtime contract", "minutes": 45, "kind": "diagnose",
+          "outcome": "Вы прочитаете TC39 proposal и отделите stage, specification text и finished inclusion.",
+          "releaseStatus": "planned", "requires": ["javascript-language-basics"], "introduces": ["proposal-lifecycle"], "defers": []
+        },
+        {
+          "id": "12-03", "title": "Uint8Array Base64 показывает разрыв между ES2026 и runtime", "minutes": 55, "kind": "design",
+          "outcome": "Для ES2026 Uint8Array Base64/hex methods вы соберёте четыре независимых evidence: точный specification anchor, runtime probes в Node.js 24/26 и pinned Chromium, type probe в TypeScript 7.0.2 с ESNext.TypedArrays и build probe в pinned Rollup; неподдержанные клетки останутся явно красными и приведут к решению о fallback.",
+          "releaseStatus": "planned", "requires": ["proposal-lifecycle", "typescript-basics", "binary-data", "rollup-build"], "introduces": ["feature-availability-matrix", "es2026-uint8array-base64"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "slug": "browser-event-loop",
+      "title": "Event loop браузера",
+      "goal": "Связать tasks, microtasks и rendering opportunities с видимым порядком браузерных событий.",
+      "sessions": [
+        {
+          "id": "13-01", "title": "Event loop выбирает runnable task", "minutes": 45, "kind": "observe",
+          "outcome": "По trace вы восстановите task sources и порядок выбранных runnable tasks, не предполагая общей нормативной FIFO-очереди между sources.",
+          "releaseStatus": "planned", "requires": ["dom-basics"], "introduces": ["browser-task-queues"], "defers": ["browser-microtasks", "rendering-opportunities"]
+        },
+        {
+          "id": "13-02", "title": "Microtask checkpoint опустошает очередь", "minutes": 50, "kind": "observe",
+          "outcome": "Вы предскажете порядок Promise callbacks и queueMicrotask внутри одной task.",
+          "releaseStatus": "planned", "requires": ["browser-task-queues", "promise-resolution"], "introduces": ["browser-microtasks"], "defers": []
+        },
+        {
+          "id": "13-03", "title": "Rendering получает возможность, а не обещание", "minutes": 55, "kind": "experiment",
+          "outcome": "Вы запишете trace task, microtasks и requestAnimationFrame без выдуманного стабильного FPS.",
+          "releaseStatus": "planned", "requires": ["browser-microtasks"], "introduces": ["rendering-opportunities"], "defers": []
+        },
+        {
+          "id": "13-04", "title": "Timer задаёт нижнюю границу задержки", "minutes": 50, "kind": "experiment",
+          "outcome": "Вы измерите порядок nested timers и отделите timeout argument от фактического времени запуска.",
+          "releaseStatus": "planned", "requires": ["rendering-opportunities"], "introduces": ["timer-scheduling"], "defers": []
+        },
+        {
+          "id": "13-05", "title": "Microtask chain может не отдать управление", "minutes": 55, "kind": "debug",
+          "outcome": "Вы устраните starvation и подтвердите, что пользовательское событие снова обрабатывается.",
+          "releaseStatus": "planned", "requires": ["timer-scheduling", "browser-microtasks"], "introduces": ["browser-starvation"], "defers": []
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "slug": "node-event-loop",
+      "title": "Event loop Node.js",
+      "goal": "Объяснять порядок Node.js callbacks через фазы runtime, microtasks и состояние активных handles.",
+      "sessions": [
+        {
+          "id": "14-01", "title": "Node.js проходит фазы event loop", "minutes": 50, "kind": "observe",
+          "outcome": "Вы сопоставите timer, I/O callback и check callback с фазами Node.js trace.",
+          "releaseStatus": "planned", "requires": ["node-basics"], "introduces": ["node-event-loop-phases"], "defers": ["node-nexttick-microtasks", "node-version-compatibility"]
+        },
+        {
+          "id": "14-02", "title": "CJS и ESM меняют контекст nextTick/microtask trace", "minutes": 50, "kind": "compare",
+          "outcome": "Вы выполните один явно заданный scheduling fixture как .cjs и .mjs и объясните две наблюдённые последовательности process.nextTick и Promise continuation.",
+          "releaseStatus": "planned", "requires": ["node-event-loop-phases", "promise-resolution"], "introduces": ["node-nexttick-microtasks"], "defers": []
+        },
+        {
+          "id": "14-03", "title": "setImmediate соревнуется с timer не всегда одинаково", "minutes": 55, "kind": "experiment",
+          "outcome": "Вы сравните scheduling из main module и I/O callback, сохранив оба trace.",
+          "releaseStatus": "planned", "requires": ["node-nexttick-microtasks"], "introduces": ["node-timers-immediates"], "defers": []
+        },
+        {
+          "id": "14-04", "title": "Referenced resource удерживает процесс", "minutes": 50, "kind": "diagnose",
+          "outcome": "Вы найдёте referenced resource, который не даёт процессу завершиться, сравните его с unref-вариантом и исправите lifecycle явным cleanup.",
+          "releaseStatus": "planned", "requires": ["node-event-loop-phases", "structured-async-lifetime"], "introduces": ["node-io-liveness"], "defers": []
+        },
+        {
+          "id": "14-05", "title": "Runtime version входит в доказательство", "minutes": 60, "kind": "compare",
+          "outcome": "Вы прогоните один event-loop probe на точных Node.js 24.x и 26.x, сохраните version/platform metadata и допустите вывод, что документированной разницы нет, не считая timing noise.",
+          "releaseStatus": "planned", "requires": ["node-event-loop-phases", "node-nexttick-microtasks", "node-timers-immediates"], "introduces": ["node-version-compatibility"], "defers": []
         }
       ]
     }
   ],
   "capstone": {
     "id": "capstone",
-    "title": "Итоговый проект",
-    "goal": "Опишите проект, который объединяет освоенные результаты.",
-    "sessions": []
+    "title": "Plugin runtime как публичная библиотека",
+    "goal": "Создать cross-runtime plugin runtime, проверить его независимыми consumers и выпустить в собственную публичную npm organization.",
+    "sessions": [
+      {
+        "id": "15-01", "title": "Контракт плагина начинается с недоверенного входа", "minutes": 55, "kind": "design",
+        "outcome": "Из результатов об unsafe keys, async error topology, structured lifetime с AbortSignal и Worker facts вы выведете и явно пометите локальную design policy: capabilities, lifecycle и failure contract для доверенного plugin code с недоверенными входными сообщениями; Worker-as-sandbox будет исключён из threat model.",
+        "releaseStatus": "planned", "requires": ["prototype-pollution", "abort-signals", "structured-async-lifetime", "async-error-topology", "worker-message-passing"], "introduces": ["plugin-contract"], "defers": []
+      },
+      {
+        "id": "15-02", "title": "Package surface отделяет host от plugin API", "minutes": 55, "kind": "build",
+        "outcome": "Вы создадите package entry points, исполняемые .js files и .d.ts contract из erasable TypeScript source без runtime .ts в tarball.",
+        "releaseStatus": "planned", "requires": ["plugin-contract", "package-contract"], "introduces": ["plugin-package-surface"], "defers": []
+      },
+      {
+        "id": "15-03", "title": "Loader управляет ESM-графом плагинов", "minutes": 60, "kind": "build",
+        "outcome": "Вы загрузите валидный plugin и вернёте диагностируемую ошибку для несовместимого module contract.",
+        "releaseStatus": "planned", "requires": ["plugin-package-surface", "dynamic-import-boundaries"], "introduces": ["plugin-loader"], "defers": []
+      },
+      {
+        "id": "15-04", "title": "Lifecycle завершает работу и отмену", "minutes": 55, "kind": "integrate",
+        "outcome": "Вы реализуете start, stop и AbortSignal без фоновых задач после stop.",
+        "releaseStatus": "planned", "requires": ["plugin-loader", "structured-async-lifetime"], "introduces": ["plugin-lifecycle"], "defers": []
+      },
+      {
+        "id": "15-05", "title": "Два worker-adapter сохраняют один contract", "minutes": 60, "kind": "integrate",
+        "outcome": "Вы подключите доверенный plugin code к отдельным browser Worker и node:worker_threads adapters; один conformance fixture подтвердит общий message protocol без заявления о security sandbox.",
+          "releaseStatus": "planned", "requires": ["plugin-lifecycle", "worker-message-passing", "browser-module-resolution"], "introduces": ["plugin-worker-boundary"], "defers": []
+      },
+      {
+        "id": "15-06", "title": "Host задаёт backpressure плагину", "minutes": 55, "kind": "integrate",
+        "outcome": "Вы ограничите очередь событий и проведёте отмену через plugin pipeline.",
+        "releaseStatus": "planned", "requires": ["plugin-worker-boundary", "cancellable-pipelines"], "introduces": ["plugin-backpressure"], "defers": []
+      },
+      {
+        "id": "15-07", "title": "Готовый diagnostic trace объясняет зависший plugin", "minutes": 55, "kind": "diagnose",
+        "outcome": "По заранее заданной trace schema вы локализуете один незавершённый handle и подтвердите redaction fixture для пользовательских данных.",
+        "releaseStatus": "planned", "requires": ["plugin-backpressure", "leak-diagnostics", "node-io-liveness"], "introduces": ["plugin-diagnostics"], "defers": []
+      },
+      {
+        "id": "15-08", "title": "Одна matrix-команда проверяет будущий tarball", "minutes": 60, "kind": "integrate",
+        "outcome": "Вы создадите один именованный packed tarball, зафиксируете его SHA-256 и запустите заранее подготовленную matrix именно над этим файлом в Node.js 24.x, Node.js 26.x, pinned Playwright Chromium и TypeScript consumers, сохранив версии и digest в отчёте.",
+        "releaseStatus": "planned", "requires": ["plugin-diagnostics", "packed-consumer-testing", "node-version-compatibility"], "introduces": ["plugin-consumer-matrix"], "defers": []
+      },
+      {
+        "id": "15-09", "title": "Первая публичная версия с интерактивной 2FA", "minutes": 60, "kind": "ship",
+        "outcome": "После обязательного account preflight вы опубликуете с 2FA командой npm publish ./<package.tgz> --access public ровно тот tarball и SHA-256, которые прошли matrix в 15-08, а затем проверите public metadata и анонимную установку этой версии из registry.",
+        "releaseStatus": "planned", "requires": ["plugin-consumer-matrix", "package-manager-basics", "git-basics"], "introduces": ["npm-first-publication"], "defers": []
+      },
+      {
+        "id": "15-10", "title": "GitHub Actions выпускает patch через trusted publishing", "minutes": 60, "kind": "ship",
+        "outcome": "После отдельного GitHub Actions preflight вы выпустите публичный patch из публичного source repository: один workflow на GitHub-hosted runner собирает tarball, фиксирует digest, проверяет matrix и передаёт тот же файл в прямой npm publish через trusted publisher; DONE сверяет repository metadata, registry version, consumer script, digest evidence и автоматически созданную provenance attestation.",
+        "releaseStatus": "planned", "requires": ["npm-first-publication"], "introduces": ["trusted-publishing-provenance"], "defers": []
+      }
+    ]
   }
 }

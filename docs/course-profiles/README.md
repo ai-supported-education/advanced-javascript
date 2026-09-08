@@ -11,6 +11,7 @@ content-review.
 | Курс | Рекомендуемые profiles |
 | --- | --- |
 | Vue → React | `transition`, `software`, `react` |
+| Углублённый JavaScript | `software`, `advanced-javascript` |
 | Node.js → Java | `transition`, `software` и отдельный `java`, если нужны правила стека |
 | Алгоритмы | `software`, `quantitative` |
 | Компьютерные сети | `lab`, `quantitative`, `network-safety`, `networking` |

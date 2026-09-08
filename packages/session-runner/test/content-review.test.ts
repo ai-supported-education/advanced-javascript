@@ -74,6 +74,8 @@ describe("author content review", () => {
     expect(blind).not.toContain("custom consistency marker");
     expect(blind).not.toContain("private key marker");
     expect(blind).not.toContain("learner draft");
+    expect(blind).toContain("Redacted learner-editable structure");
+    expect(blind).toContain('"reason": "<learner value redacted>"');
     expect(blind).not.toContain("hidden hint marker");
     expect(blind).not.toContain("reference solution marker");
     expect(blind).not.toContain("quiz data marker");
@@ -88,6 +90,8 @@ describe("author content review", () => {
     expect(blind).toContain("## Learner walkthrough");
     expect(blind).toContain("## Explanation and examples");
     expect(blind).toContain("## Task, evidence and DONE");
+    expect(blind).toContain("прогноз обязан предшествовать первому запуску");
+    expect(blind).toContain("форму editable artifacts");
     expect(blind).toContain("## Continuity");
     expect(blind.indexOf("Current explanation")).toBeLessThan(
       blind.indexOf("timestamp_ms,latency_ms")
@@ -99,6 +103,7 @@ describe("author content review", () => {
     expect(consistency).toContain("custom consistency marker");
     expect(consistency).not.toContain("private key marker");
     expect(consistency).not.toContain("learner draft");
+    expect(consistency).toContain("Redacted learner-editable structure");
     expect(consistency).not.toContain("hidden hint marker");
     expect(consistency).not.toContain("reference solution marker");
     expect(consistency).toContain("quiz data marker");
@@ -110,6 +115,26 @@ describe("author content review", () => {
     expect(consistency).toContain("не должны получать или искать novice report");
     expect(consistency).toContain("## Continuity and profiles");
     expect(consistency).not.toContain("## First contact and language");
+  });
+
+  it("hashes answer structure without exposing or hashing learner values", async () => {
+    const root = await createWorkspace();
+    const answerPath = path.join(
+      root,
+      "modules/01-test/sessions/01-02/answers.json"
+    );
+    const before = await prepareContentReview(root, "session", "01-02");
+
+    await writeFile(answerPath, '{"reason":"different private value"}\n');
+    const afterValue = await prepareContentReview(root, "session", "01-02");
+    expect(afterValue.contentHash).toBe(before.contentHash);
+
+    await writeFile(
+      answerPath,
+      '{"reason":"different private value","confidence":null}\n'
+    );
+    const afterShape = await prepareContentReview(root, "session", "01-02");
+    expect(afterShape.contentHash).not.toBe(before.contentHash);
   });
 
   it("includes and hashes learner sources for transitive prerequisites", async () => {
@@ -362,7 +387,17 @@ describe("author content review", () => {
 
   it("builds a separate subject packet with learner, author, source and toolchain contracts for v3", async () => {
     const root = await createV3Workspace();
-    const prepared = await prepareContentReview(root, "session", "01-02");
+    const minimalPatch =
+      "diff --git a/exercise.js b/exercise.js\n+// reviewer-only minimal patch marker\n \n";
+    const prepared = await prepareContentReview(
+      root,
+      "session",
+      "01-02",
+      async (_root, relativePath) =>
+        relativePath.endsWith("minimal.patch")
+          ? minimalPatch
+          : "diff --git a/exercise.js b/exercise.js\n+// reviewer-only counterexample patch marker\n"
+    );
 
     expect(prepared.protocol).toBe(CONTENT_REVIEW_PROTOCOL_V3);
     expect(prepared.stages).toEqual(["subject", "novice", "consistency"]);
@@ -379,6 +414,19 @@ describe("author content review", () => {
     expect(subject).toContain("Secret rubric");
     expect(subject).toContain("acceptance marker");
     expect(subject).toContain("expected starter failure marker");
+    expect(subject).toContain("### Recorded author proof evidence");
+    expect(subject).toContain('"status": "EXPECTED_FAILURE"');
+    expect(subject).toContain('"status": "PASS"');
+    expect(subject).toContain("starter-output-hash-marker");
+    expect(subject).toContain('"node": "v24.0.0"');
+    expect(subject).toContain("### Reviewer-only proof variants");
+    expect(subject).toContain("reviewer-only minimal patch marker");
+    expect(subject).toContain("reviewer-only counterexample patch marker");
+    const minimalHeading = subject.indexOf("##### Minimal solution:");
+    const minimalBodyStart =
+      subject.indexOf("~~~~diff\n", minimalHeading) + "~~~~diff\n".length;
+    const minimalBodyEnd = subject.indexOf("~~~~", minimalBodyStart);
+    expect(subject.slice(minimalBodyStart, minimalBodyEnd)).toBe(minimalPatch);
     expect(subject).toContain("## Source ledger (curriculum/source-ledger.json)");
     expect(subject).toContain("Primary JavaScript source");
     expect(subject).toContain("## Toolchain documents");
@@ -405,7 +453,7 @@ describe("author content review", () => {
     expect(moduleSubject).toContain('"id": "01-03"');
   });
 
-  it("includes source ledger and toolchain documents in the v3 content hash", async () => {
+  it("includes source ledger, toolchain and author proof evidence in the v3 content hash", async () => {
     const root = await createV3Workspace();
     const before = await prepareContentReview(root, "session", "01-02");
     const ledgerPath = path.join(root, "curriculum/source-ledger.json");
@@ -423,6 +471,15 @@ describe("author content review", () => {
     );
     const afterToolchain = await prepareContentReview(root, "session", "01-02");
     expect(afterToolchain.contentHash).not.toBe(afterLedger.contentHash);
+
+    const proofPath = path.join(root, "curriculum/proofs/01-02.json");
+    const proof = JSON.parse(await readFile(proofPath, "utf8")) as {
+      checkedAt: string;
+    };
+    proof.checkedAt = "2026-09-08T00:00:00.000Z";
+    await writeFile(proofPath, `${JSON.stringify(proof, null, 2)}\n`);
+    const afterProof = await prepareContentReview(root, "session", "01-02");
+    expect(afterProof.contentHash).not.toBe(afterToolchain.contentHash);
   });
 
   it("requires three current v3 passes and writes a schema v3 attestation", async () => {
@@ -1004,12 +1061,15 @@ async function createV3Workspace(): Promise<string> {
   };
   manifest.reviewProtocol = CONTENT_REVIEW_PROTOCOL_V3;
   manifest.toolchainFiles = ["package.json", "tsconfig.json"];
+  const proofSessionIds: string[] = [];
   for (const session of [
     ...manifest.modules.flatMap((module) => module.sessions),
     ...manifest.capstone.sessions
   ]) {
     const checks = Array.isArray(session.checks) ? session.checks : [];
     if (checks.includes("unit")) {
+      const sessionId = String(session.id);
+      proofSessionIds.push(sessionId);
       session.authorProof = {
         check: "unit",
         expectedStarterFailure: "expected starter failure marker",
@@ -1019,6 +1079,46 @@ async function createV3Workspace(): Promise<string> {
     }
   }
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  await mkdir(path.join(root, "curriculum/proofs"), { recursive: true });
+  for (const sessionId of proofSessionIds) {
+    await writeFile(
+      path.join(root, "curriculum/proofs", `${sessionId}.json`),
+      `${JSON.stringify(
+        {
+          schemaVersion: 1,
+          sessionId,
+          checkedAt: "2026-09-07T00:00:00.000Z",
+          runtime: {
+            node: "v24.0.0",
+            platform: "linux",
+            arch: "x64"
+          },
+          sessionContentHash: "session-content-hash-marker",
+          toolchainHash: "toolchain-hash-marker",
+          definitionHash: "definition-hash-marker",
+          check: "unit",
+          starter: {
+            status: "EXPECTED_FAILURE",
+            outputSha256: "starter-output-hash-marker"
+          },
+          solution: {
+            status: "PASS",
+            patchSha256: "solution-patch-hash-marker",
+            outputSha256: "solution-output-hash-marker"
+          },
+          counterexamples: [
+            {
+              status: "EXPECTED_FAILURE",
+              patchSha256: "counterexample-patch-hash-marker",
+              outputSha256: "counterexample-output-hash-marker"
+            }
+          ]
+        },
+        null,
+        2
+      )}\n`
+    );
+  }
   await writeFile(
     path.join(root, "curriculum/source-ledger.json"),
     `${JSON.stringify(

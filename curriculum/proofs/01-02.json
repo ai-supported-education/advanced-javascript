@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "sessionId": "01-02",
+  "checkedAt": "2026-09-08T01:48:14.611Z",
+  "runtime": {
+    "node": "v24.20.0",
+    "platform": "linux",
+    "arch": "arm64"
+  },
+  "sessionContentHash": "c4c272fc064fd3403bd7cdb087eb88848cdc6c58f4192877254285d2fe2a6bbb",
+  "toolchainHash": "693f9215a59bd19f14e1e7a35f9b48f8b5998820bdafe872d2e1f45612cd77fa",
+  "definitionHash": "3f5b354446ae72fb1eac98f14e8d843ccf0185341a2f69ab18676a90216cc5ee",
+  "check": "unit",
+  "starter": {
+    "status": "EXPECTED_FAILURE",
+    "outputSha256": "91a264cf2f1081372c9d05f84dfdd787c5990b55fe9ba19eb2cb56710d41d5e6"
+  },
+  "solution": {
+    "status": "PASS",
+    "patchSha256": "760150404ca429a1124af8e7f0a3a7bef161a285b892e11f81c30db480d26272",
+    "outputSha256": "cc9d08a8ef733bda63df715b0223437d2ef8b0df682f382e9e1246c66d7b8267"
+  },
+  "counterexamples": [
+    {
+      "status": "EXPECTED_FAILURE",
+      "patchSha256": "8f3c694d75905c984700b711d664900b492b3f6a7584926b263b163f31b72103",
+      "outputSha256": "49d7fd9637196993f2b573441ad5cd87f945dbe6c94e983d08d52fc52ea81037"
+    },
+    {
+      "status": "EXPECTED_FAILURE",
+      "patchSha256": "9d8019929b658ab1e784b95bae5aae859a9d402f3ced7aee8f05128fd03efcde",
+      "outputSha256": "bd0c6135cbf95b922931ee4bf10b315980e1ae43d9c398bd671a2867233b4baf"
+    }
+  ]
+}

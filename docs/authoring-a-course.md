@@ -8,7 +8,10 @@
 предметные основания — в `curriculum/source-ledger.json`. Запустите
 `pnpm author:roadmap-review`: отдельный fresh curriculum-agent проверяет progression
 и capstone traceability, отдельный fresh subject-agent — охват, корректность и
-currentness по первичным источникам. После двух PASS запишите их и выполните
+currentness по первичным источникам. Subject packet содержит тот же корневой
+README, profiles, `courseContextFiles`, source ledger и `toolchainFiles`, на
+которые опирается roadmap: versioned preflight или toolchain claim нельзя оставить
+доступным только автору. После двух PASS запишите их и выполните
 `pnpm author:roadmap-review attest`.
 
 Полный цикл записи выглядит так:
@@ -21,10 +24,11 @@ pnpm author:roadmap-review status
 pnpm author:roadmap-review attest
 ```
 
-Исправление progression инвалидирует оба roadmap review; изменение только source
-metadata — subject review. Повторите помеченные как stale стадии новыми агентами.
-Curriculum и subject используют разные hashes, поэтому source metadata не
-инвалидирует структурный curriculum PASS.
+Исправление progression либо общего course context инвалидирует оба roadmap
+review; изменение только source metadata или `toolchainFiles` — subject review.
+Повторите помеченные как stale стадии новыми агентами. Curriculum и subject
+используют разные hashes, поэтому чистая правка ledger/toolchain не инвалидирует
+структурный curriculum PASS.
 
 ## 1. Зафиксируйте аудиторию и проверяемый финал
 
@@ -179,6 +183,23 @@ implementation не работает. Для другого языка заме�
 учащийся, а агент сверяет процедуру и rubric. `manual-approval` применяйте только с
 явно названной ролью и критерием, который нельзя честно автоматизировать.
 
+Любое empirical evidence, даже без red/green цикла, должно оставаться
+воспроизводимым после закрытия терминала: сохраняйте версию значимой среды или
+runtime, точную команду, наблюдаемый вывод/trace и отдельно помечайте прогноз.
+Одного упоминания требуемой версии в README недостаточно.
+
+Если DONE требует agent review, learner-facing карточка должна провести учащегося
+через весь handoff: зелёный `session:check`, пакет `pnpm session:review`, запрос
+Codex на проверку, фактически записанный агентом verdict и
+`pnpm session:finish`. Не формулируйте check так, будто он сам вызывает агента.
+
+Проверьте порядок действий отдельно от полноты списка. Требование «сначала
+спрогнозируйте» несовместимо с более ранней командой запуска того же fixture;
+требование сохранить красный baseline должно находиться до изменения starter.
+Для каждого learner-editable artifact назовите файл и покажите его незаполненную
+форму либо явно опишите поля. Правильные ответы, тезисы для `reason` и reference
+solution при этом не раскрываются.
+
 Rubric копируется из `templates/rubric.md` и разделяет invariants, valid
 alternatives, evidence/safety и optional improvements. Не маскируйте смысловую
 оценку хрупким поиском строк.
@@ -225,6 +246,14 @@ Solution и counterexample patches хранятся только в `course-supp
 counterexample, запускает один acceptance check и публикует лишь hashes evidence.
 Падение starter должно содержать заявленный фрагмент причины; зелёный starter или
 прошедший counterexample блокируют публикацию.
+
+Следующий subject packet включает статусы, runtime metadata, timestamp и hashes,
+а также reviewer-only копии solution/counterexample patches. Они нужны
+предметнику, чтобы проверить минимальность решения и релевантность отрицательных
+контролей. Packet остаётся в игнорируемой `.authoring/`, не передаётся novice- или
+consistency-agent и не цитируется в отчёте. Вывод команд и quiz answers в packet
+не попадают. Proof входит в content hash; повторный `author:proof` после review
+честно делает review stale.
 
 Не записывайте в материал результаты, которых не наблюдали. Если реальную среду
 проверить нельзя, честно ограничьте evidence fixture/simulation.

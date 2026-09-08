@@ -23,7 +23,7 @@ import {
   SOURCE_LEDGER_PATH,
   type SourceLedger
 } from "./source-ledger.js";
-import { readSupportFile } from "./support.js";
+import { readSupportFile, type SupportLoader } from "./support.js";
 import { loadToolchainDocuments } from "./toolchain.js";
 import type {
   CourseManifest,
@@ -43,6 +43,7 @@ export const CONTENT_REVIEW_PROTOCOL =
   "novice-walkthrough-consistency-v8" as const;
 export const CONTENT_REVIEW_PROTOCOL_V3 =
   "roadmap-subject-novice-consistency-v1" as const;
+const CONTENT_REVIEW_PACKET_REVISION = "subject-proof-patches-v1" as const;
 export const CONTENT_REVIEW_OPENING_MARKER =
   "<!-- content-review:opening:end -->" as const;
 export const LEARNER_FACING_LANGUAGE_PATH =
@@ -170,6 +171,12 @@ interface NoviceOpeningDocument {
   opening: string;
 }
 
+interface AuthorProofDocument {
+  path: string;
+  source: string | null;
+  summary: unknown;
+}
+
 const inlineTextExtensions = new Set([
   ".c",
   ".cc",
@@ -236,7 +243,8 @@ const maxInlineBytes = 256 * 1024;
 export async function prepareContentReview(
   root: string,
   scope: ContentReviewScope,
-  id: string
+  id: string,
+  supportLoader: SupportLoader = readSupportFile
 ): Promise<PreparedContentReview> {
   const target = await resolveTarget(root, scope, id);
   const protocol = contentReviewProtocol(target.manifest);
@@ -275,7 +283,7 @@ export async function prepareContentReview(
   if (subjectPacketPath) {
     await writeFile(
       subjectPacketPath,
-      await buildSubjectPacket(root, target, contentHash),
+      await buildSubjectPacket(root, target, contentHash, supportLoader),
       "utf8"
     );
   }
@@ -648,6 +656,8 @@ async function hashReviewTarget(root: string, target: ReviewTarget): Promise<str
   hash.update("\0");
 
   if (protocol === CONTENT_REVIEW_PROTOCOL_V3) {
+    hash.update(`packet-revision:${CONTENT_REVIEW_PACKET_REVISION}`);
+    hash.update("\0");
     const ledger = relevantSourceLedger(await loadSourceLedger(root), target);
     hash.update(`source-ledger:${SOURCE_LEDGER_PATH}`);
     hash.update("\0");
@@ -660,6 +670,12 @@ async function hashReviewTarget(root: string, target: ReviewTarget): Promise<str
       hash.update(`toolchain:${document.path}`);
       hash.update("\0");
       hash.update(document.source);
+      hash.update("\0");
+    }
+    for (const document of await loadAuthorProofDocuments(root, target)) {
+      hash.update(`author-proof:${document.path}`);
+      hash.update("\0");
+      hash.update(document.source ?? "MISSING");
       hash.update("\0");
     }
   }
@@ -728,6 +744,15 @@ async function hashReviewTarget(root: string, target: ReviewTarget): Promise<str
       hash.update("\0");
     }
   }
+  for (const session of target.targetSessions) {
+    const redacted = await readRedactedAnswerStructure(root, session);
+    if (redacted) {
+      hash.update(`learner-answer-structure:${redacted.path}`);
+      hash.update("\0");
+      hash.update(redacted.source);
+      hash.update("\0");
+    }
+  }
   for (const session of collectPrerequisiteSourceSessions(target)) {
     const absolutePath = path.join(getSessionDirectory(root, session), "README.md");
     hash.update(`prerequisite-source:${session.definition.id}`);
@@ -764,6 +789,7 @@ async function buildNovicePacket(
     "Не достраивайте пропуски из собственных экспертных знаний. Если смысл можно восстановить только потому, что вы уже знаете предмет или API, это finding, а не доказательство понятности.",
     "Построчно проверьте указательные ссылки (`такой`, `этот`, `похожий`, `здесь` и аналогичные): назовите точный antecedent, который уже появился до ссылки. Если его нет или вариантов несколько, зафиксируйте разрыв.",
     "Составьте список каждого центрального identifier, API, команды и термина в порядке первого появления. Для каждого укажите место, где до использования объяснены его роль и происхождение. Простого узнавания имени reviewer недостаточно.",
+    "Термин в заголовке не считается объяснённым самим заголовком. Проверьте, что первые фразы дают ему рабочее значение, роли объектов и полей названы до вывода, а выражения вроде «обычная копия» заменены конкретной операцией.",
     "Для каждого конкретного примера, который доказывает причинное утверждение или впервые показывает новый API, восстановите начальное состояние, событие или действие и наблюдаемый результат. Если хотя бы одно звено отсутствует, учащийся не может проверить эту причинную связь по opening. Анонс будущих примеров или пункт маршрута не обязан содержать всю цепочку и не считается ведущим примером сам по себе.",
     "Opening курса и module могут быть уже прочитанным контекстом для последующей session. Используйте их как доступные antecedents, но не требуйте, чтобы preview главы заново доказывал каждый пример текущей карточки. Текущую session всё равно проверяйте без скидки на поздний текст.",
     "В module packet после opening каждой опубликованной session показан компактный learner-visible результат, который становится доступен только после завершения этой session. Используйте его как контекст для следующей карточки, но не исправляйте им opening той же карточки задним числом.",
@@ -1048,6 +1074,7 @@ async function buildBlindPacket(
     "Если вы novice-reviewer, открывайте этот packet только после собственного сохранённого first-contact checkpoint и отдельного follow-up родителя. Пройдите материал сверху вниз как учащийся: проверьте каждое объяснение, пример, переход, задание, evidence и DONE. Не улучшайте выводы first-contact благодаря позднему тексту; перенесите их в итоговый report без ретроспективного смягчения. Не открывайте `02-consistency.md`.",
     "Если вы consistency-reviewer, это ваша первая фаза. Вы не читаете `00-novice.md`, checkpoint или итоговый novice report. До открытия `02-consistency.md` письменно восстановите outcome, причинную модель, порядок примеров, точное задание, ожидаемый evidence, DONE и всё, что осталось неясным.",
     "Для обеих ролей: работайте как учащийся с заявленными входными знаниями. Отметьте неизвестные термины, скрытые переходы и места, понятные только из собственных экспертных знаний. Различайте исходный факт, допущение, ожидаемый результат, наблюдение и вывод; для практики проверьте preflight, безопасный scope, stop conditions и cleanup/rollback.",
+    "Читайте команды строго сверху вниз и проверяйте временной контракт evidence: прогноз обязан предшествовать первому запуску, baseline — исправлению, а review — зелёному check. Для каждого названного editable artifact проверьте, что learner-facing материал показывает путь и незаполненную структуру, достаточную для работы без rubric или hidden key. Если DONE требует agent review, должен быть понятен handoff от session:check к packet, фактическому verdict и session:finish; не считайте check вызовом агента.",
     "Не изменяйте файлы и не ищите repository, course-support, hints, quiz keys или solutions.",
     "",
     "## Declared learner baseline",
@@ -1127,7 +1154,7 @@ async function buildBlindPacket(
     "",
     "## Task, evidence and DONE",
     "",
-    "Можно ли выполнить задание и доказать DONE только по learner-facing материалу, не открывая rubric, tests, hints или следующую карточку.",
+    "Можно ли выполнить задание и доказать DONE только по learner-facing материалу, не открывая rubric, tests, hints или следующую карточку. Отдельно проверьте хронологию команд, форму editable artifacts и полный handoff к обязательному agent review. Если требуются фактические red/green запуски, найдите сохраняемый artifact для версии среды, команды, exit code и наблюдения: эфемерного terminal output недостаточно.",
     "",
     "## Continuity",
     "",
@@ -1159,7 +1186,7 @@ async function buildConsistencyPacket(
     "",
     "Открывайте этот packet только после письменно зафиксированного learner reconstruction по `01-blind.md`. Теперь сопоставьте собственное понимание с manifest, profiles, rubric, acceptance tests и соседними карточками.",
     "Вы не должны получать или искать novice report: novice и consistency verdict дают два независимых fresh agents.",
-    "Проверьте prerequisites, причинные переходы, соответствие README/rubric/checks/evidence, реалистичность 30–60 минут и естественный handoff к следующей теме. Для каждого prerequisite используйте provenance-карту и приложенный learner source: соседняя карточка не обязана быть местом его первоначального введения.",
+    "Проверьте prerequisites, причинные переходы, соответствие README/rubric/checks/evidence, реалистичность 30–60 минут и естественный handoff к следующей теме. Проверьте хронологию команд, доступную учащемуся структуру каждого editable artifact и полный переход session:check → agent review → записанный verdict → session:finish. Для каждого prerequisite используйте provenance-карту и приложенный learner source: соседняя карточка не обязана быть местом его первоначального введения.",
     "Проверьте первое впечатление и язык: cold open без контекста у первого материала курса или главы, термины до понятного якоря, резкие переходы и машинную спецификационную прозу. Такой cold open или системно нечитаемый язык — MAJOR; отдельная тяжёлая фраза, не мешающая модели, — MINOR.",
     "Проверьте openings курса, module и session по собственному blind reconstruction. Не засчитывайте хороший верхнеуровневый README или позднее объяснение как исправление холодного начала карточки.",
     "Каждое языковое замечание обязано привести точную цитату, описать эффект для учащегося и назвать тип исправления, не переписывая материал за автора.",
@@ -1249,7 +1276,8 @@ async function buildConsistencyPacket(
 async function buildSubjectPacket(
   root: string,
   target: ReviewTarget,
-  contentHash: string
+  contentHash: string,
+  supportLoader: SupportLoader
 ): Promise<string> {
   const ledger = relevantSourceLedger(await loadSourceLedger(root), target);
   const toolchain = await loadToolchainDocuments(
@@ -1264,7 +1292,7 @@ async function buildSubjectPacket(
     "",
     "## Reviewer contract",
     "",
-    "Вы — независимый fresh subject-reviewer без истории генерации. Получите только этот packet: не открывайте repository, novice/consistency packets, reports, hints или solutions.",
+    "Вы — независимый fresh subject-reviewer без истории генерации. Получите только этот packet: не открывайте repository, novice/consistency packets, reports или сам ref course-support. Reviewer-only patches уже вложены ниже; не цитируйте их код и не переносите готовое решение в отчёт.",
     "Проверьте предметную корректность и современность learner contract, затем сверите её с author contract, source ledger и фактическими toolchain documents. Source ledger задаёт проверяемые источники, но не заменяет проверку того, что источник действительно поддерживает конкретное утверждение.",
     "Для каждого существенного утверждения отличайте стандарт языка от host API, поведения runtime/engine и преобразований toolchain. Не переносите наблюдение одной версии или среды на все реализации без доказательства; inference называйте inference.",
     "Проверьте, что author contract, rubric, checks и acceptance evidence не требуют и не закрепляют предметно неверную модель. Для code exercise отдельно оцените заявленный starter failure, минимальный solution proof и counterexamples, не публикуя готовое решение учащемуся.",
@@ -1277,7 +1305,7 @@ async function buildSubjectPacket(
     "",
     "## Author contract",
     "",
-    await renderSubjectAuthorContract(root, target),
+    await renderSubjectAuthorContract(root, target, supportLoader),
     "",
     `## Source ledger (${SOURCE_LEDGER_PATH})`,
     "",
@@ -1381,7 +1409,8 @@ async function renderSubjectLearnerContract(
 
 async function renderSubjectAuthorContract(
   root: string,
-  target: ReviewTarget
+  target: ReviewTarget,
+  supportLoader: SupportLoader
 ): Promise<string> {
   const manifestContract = {
     protocol: CONTENT_REVIEW_PROTOCOL_V3,
@@ -1416,8 +1445,164 @@ async function renderSubjectAuthorContract(
     "",
     "### Hidden quiz acceptance evidence",
     "",
-    await renderQuizAcceptanceEvidence(root, target.targetSessions)
+    await renderQuizAcceptanceEvidence(root, target.targetSessions),
+    "",
+    "### Recorded author proof evidence",
+    "",
+    await renderAuthorProofEvidence(root, target, supportLoader)
   ].join("\n");
+}
+
+async function loadAuthorProofDocuments(
+  root: string,
+  target: ReviewTarget
+): Promise<AuthorProofDocument[]> {
+  const documents: AuthorProofDocument[] = [];
+  for (const session of target.targetSessions) {
+    if (!session.definition.authorProof) {
+      continue;
+    }
+    const relativePath = toPortablePath(
+      path.join("curriculum", "proofs", `${session.definition.id}.json`)
+    );
+    const absolutePath = path.join(root, relativePath);
+    try {
+      const source = await readFile(absolutePath, "utf8");
+      let summary: unknown;
+      try {
+        summary = sanitizeAuthorProofSummary(JSON.parse(source) as unknown);
+      } catch {
+        summary = { status: "INVALID_JSON" };
+      }
+      documents.push({ path: relativePath, source, summary });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+        throw error;
+      }
+      documents.push({
+        path: relativePath,
+        source: null,
+        summary: { status: "MISSING" }
+      });
+    }
+  }
+  return documents;
+}
+
+function sanitizeAuthorProofSummary(value: unknown): unknown {
+  if (!isRecord(value)) {
+    return { status: "INVALID_SHAPE" };
+  }
+  const starter = isRecord(value.starter) ? value.starter : {};
+  const solution = isRecord(value.solution) ? value.solution : {};
+  const counterexamples = Array.isArray(value.counterexamples)
+    ? value.counterexamples.map((entry) => {
+        const item = isRecord(entry) ? entry : {};
+        return {
+          status: item.status,
+          patchSha256: item.patchSha256,
+          outputSha256: item.outputSha256
+        };
+      })
+    : [];
+  return {
+    schemaVersion: value.schemaVersion,
+    sessionId: value.sessionId,
+    checkedAt: value.checkedAt,
+    runtime: isRecord(value.runtime)
+      ? {
+          node: value.runtime.node,
+          platform: value.runtime.platform,
+          arch: value.runtime.arch
+        }
+      : undefined,
+    sessionContentHash: value.sessionContentHash,
+    toolchainHash: value.toolchainHash,
+    definitionHash: value.definitionHash,
+    check: value.check,
+    starter: {
+      status: starter.status,
+      outputSha256: starter.outputSha256
+    },
+    solution: {
+      status: solution.status,
+      patchSha256: solution.patchSha256,
+      outputSha256: solution.outputSha256
+    },
+    counterexamples
+  };
+}
+
+async function renderAuthorProofEvidence(
+  root: string,
+  target: ReviewTarget,
+  supportLoader: SupportLoader
+): Promise<string> {
+  const documents = await loadAuthorProofDocuments(root, target);
+  if (documents.length === 0) {
+    return "Target не содержит исполняемых карточек с authorProof.";
+  }
+  const evidence = documents
+    .map((document) =>
+      [
+        `#### Proof: ${document.path}`,
+        "",
+        "Статусная запись показывает runtime и hashes. Проверяемые patches вложены ниже только для subject-review; вывод команд и quiz answers не раскрываются.",
+        "",
+        "```json",
+        JSON.stringify(document.summary, null, 2),
+        "```"
+      ].join("\n")
+    )
+    .join("\n\n");
+  const variants = await renderReviewerOnlyProofVariants(
+    root,
+    target,
+    supportLoader
+  );
+  return `${evidence}\n\n${variants}`;
+}
+
+async function renderReviewerOnlyProofVariants(
+  root: string,
+  target: ReviewTarget,
+  supportLoader: SupportLoader
+): Promise<string> {
+  const sections = [
+    "### Reviewer-only proof variants",
+    "",
+    "Эти patches вложены только в игнорируемый author packet. Сверьте их с acceptance test и hashes proof, но не воспроизводите solution code в отчёте."
+  ];
+
+  for (const session of target.targetSessions) {
+    const proof = session.definition.authorProof;
+    if (!proof) continue;
+    const variants = [
+      { label: "Minimal solution", relativePath: proof.solutionPatch },
+      ...proof.counterexamplePatches.map((relativePath, index) => ({
+        label: `Counterexample ${index + 1}`,
+        relativePath
+      }))
+    ];
+    sections.push("", `#### Session ${session.definition.id}`);
+    for (const variant of variants) {
+      sections.push("", `##### ${variant.label}: support/${variant.relativePath}`);
+      try {
+        const source = await supportLoader(root, variant.relativePath);
+        const digest = createHash("sha256").update(source).digest("hex");
+        if (!source.endsWith("\n")) {
+          throw new Error(
+            `Support patch ${variant.relativePath} должен завершаться переводом строки.`
+          );
+        }
+        sections.push("", `SHA-256: ${digest}`, "", "~~~~diff", source.slice(0, -1), "~~~~");
+      } catch (error) {
+        sections.push("", `UNAVAILABLE: ${formatError(error)}`);
+      }
+    }
+  }
+
+  return sections.join("\n");
 }
 
 function renderToolchainDocuments(
@@ -1779,7 +1964,65 @@ async function renderSelectedFiles(
       }
     }
   }
+  if (selection === "blind" || selection === "consistency") {
+    for (const session of sessions) {
+      const redacted = await readRedactedAnswerStructure(root, session);
+      if (!redacted) {
+        continue;
+      }
+      sections.push(
+        `### Redacted learner-editable structure: ${redacted.path}`,
+        "",
+        "Значения намеренно скрыты: packet показывает реальные object/array keys, но не ответы или learner progress.",
+        "",
+        "~~~~json",
+        redacted.source,
+        "~~~~",
+        ""
+      );
+    }
+  }
   return sections.length > 0 ? sections.join("\n").trimEnd() : "(no files)";
+}
+
+async function readRedactedAnswerStructure(
+  root: string,
+  session: FlatSession
+): Promise<{ path: string; source: string } | null> {
+  const absolutePath = path.join(
+    getSessionDirectory(root, session),
+    "answers.json"
+  );
+  if (!(await fileExists(absolutePath))) {
+    return null;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(await readFile(absolutePath, "utf8"));
+  } catch (error) {
+    throw new Error(
+      `${session.definition.id}: answers.json должен быть валидным JSON для безопасной публикации его структуры: ${formatError(error)}`
+    );
+  }
+  return {
+    path: toPortablePath(path.relative(root, absolutePath)),
+    source: JSON.stringify(redactLearnerValues(parsed), null, 2)
+  };
+}
+
+function redactLearnerValues(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => redactLearnerValues(entry));
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        key,
+        redactLearnerValues(entry)
+      ])
+    );
+  }
+  return "<learner value redacted>";
 }
 
 function selectedForPacket(

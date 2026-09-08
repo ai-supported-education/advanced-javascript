@@ -1,0 +1,34 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Какую строку напечатает фрагмент с job.retries?",
+      "options": {
+        "A": "2 true true",
+        "B": "2 false true",
+        "C": "undefined false false"
+      },
+      "requiresReason": true
+    },
+    {
+      "id": "q2",
+      "prompt": "Какую строку напечатает фрагмент после delete request.format?",
+      "options": {
+        "A": "csv true true",
+        "B": "undefined false false",
+        "C": "json false true"
+      },
+      "requiresReason": true
+    },
+    {
+      "id": "q3",
+      "prompt": "Какую строку напечатает фрагмент с record.result и record.missing?",
+      "options": {
+        "A": "undefined undefined true false",
+        "B": "undefined undefined false false",
+        "C": "undefined null true false"
+      },
+      "requiresReason": true
+    }
+  ]
+}

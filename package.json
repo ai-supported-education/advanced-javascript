@@ -1,11 +1,12 @@
 {
-  "name": "ai-supported-course-template",
+  "name": "@ai-supported-education/advanced-javascript",
   "version": "0.1.0",
   "private": true,
+  "description": "Практический курс углублённого JavaScript короткими сессиями",
   "type": "module",
   "packageManager": "pnpm@10.5.0",
   "engines": {
-    "node": ">=22.12.0"
+    "node": "^24.0.0 || ^26.0.0"
   },
   "scripts": {
     "session:validate": "node --import tsx packages/session-runner/src/cli.ts validate",
@@ -25,9 +26,12 @@
     "test": "pnpm --filter @training/session-runner test"
   },
   "devDependencies": {
-    "@types/node": "26.2.0",
-    "tsx": "4.23.12",
+    "@jridgewell/trace-mapping": "0.3.31",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.4.1",
+    "rollup": "4.63.1",
+    "tsx": "4.23.13",
     "typescript": "7.0.2",
-    "vitest": "4.1.10"
+    "vitest": "5.0.0"
   }
 }

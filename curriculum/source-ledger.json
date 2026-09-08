@@ -2,14 +2,807 @@
   "schemaVersion": 1,
   "sources": [
     {
-      "id": "replace-with-primary-source",
-      "title": "Replace this placeholder with a primary source for the real course",
-      "url": "https://example.com/replace-with-primary-source",
-      "kind": "other-primary",
+      "id": "ecma-object-model",
+      "title": "ECMAScript Language Specification — Ordinary and Exotic Object Behaviours",
+      "url": "https://tc39.es/ecma262/multipage/ordinary-and-exotic-objects-behaviours.html",
+      "kind": "standard",
       "checkedAt": "2026-09-07",
       "supports": [
-        "first-real-session"
+        "property-lookup",
+        "property-descriptors",
+        "constructor-protocol"
       ]
+    },
+    {
+      "id": "ecma-object-constructor-methods",
+      "title": "ECMAScript 2026 — Properties of the Object Constructor",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-properties-of-the-object-constructor",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["property-lookup", "property-descriptors"]
+    },
+    {
+      "id": "ecma-reflect-methods",
+      "title": "ECMAScript 2026 — The Reflect Object",
+      "url": "https://tc39.es/ecma262/2026/multipage/reflection.html#sec-reflect-object",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["property-descriptors", "reflect-operations"]
+    },
+    {
+      "id": "ecma-object-initializer",
+      "title": "ECMAScript 2026 — Object Initializer",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-object-initializer",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["property-descriptors", "prototype-pollution"]
+    },
+    {
+      "id": "ecma-json-object",
+      "title": "ECMAScript 2026 — The JSON Object",
+      "url": "https://tc39.es/ecma262/2026/multipage/structured-data.html#sec-json-object",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["property-descriptors", "prototype-pollution"]
+    },
+    {
+      "id": "ecma-property-operators",
+      "title": "ECMAScript 2026 — Relational, Assignment and Delete Operator Semantics",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["property-lookup", "property-descriptors"]
+    },
+    {
+      "id": "ecma-module-strict-code",
+      "title": "ECMAScript 2026 — Strict Mode Code",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-source-code.html#sec-strict-mode-code",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["property-descriptors"]
+    },
+    {
+      "id": "node24-package-type-module",
+      "title": "Node.js 24.20.0 — package.json type field",
+      "url": "https://nodejs.org/docs/v24.20.0/api/packages.html#type",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["property-descriptors", "node-version-compatibility"]
+    },
+    {
+      "id": "ecma-legacy-proto-accessor",
+      "title": "ECMAScript 2026 — Object.prototype.__proto__",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-object.prototype.__proto__",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["prototype-pollution"]
+    },
+    {
+      "id": "ecma-annex-b-host-boundary",
+      "title": "ECMAScript 2026 — Additional Features for Web Browsers",
+      "url": "https://tc39.es/ecma262/2026/multipage/additional-ecmascript-features-for-web-browsers.html#sec-additional-ecmascript-features-for-web-browsers",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["prototype-pollution"]
+    },
+    {
+      "id": "node-disable-proto",
+      "title": "Node.js 24.20.0 CLI — --disable-proto=mode",
+      "url": "https://nodejs.org/docs/v24.20.0/api/cli.html#--disable-protomode",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["prototype-pollution", "node-version-compatibility"]
+    },
+    {
+      "id": "node-console-api",
+      "title": "Node.js 24 — Console API",
+      "url": "https://nodejs.org/download/release/latest-v24.x/docs/api/console.html#consolelogdata-args",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["property-lookup"]
+    },
+    {
+      "id": "node-release-status",
+      "title": "Node.js — Previous Releases and release status",
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": [
+        "node-version-compatibility",
+        "property-descriptors",
+        "prototype-pollution"
+      ]
+    },
+    {
+      "id": "ecma-class-definitions",
+      "title": "ECMAScript 2026 — ClassDefinitionEvaluation",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-classdefinitionevaluation",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["class-semantics"]
+    },
+    {
+      "id": "ecma-arrow-functions",
+      "title": "ECMAScript 2026 — Arrow Function Definitions",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-arrow-function-definitions",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["method-receiver", "this-binding"]
+    },
+    {
+      "id": "ecma-module-this-binding",
+      "title": "ECMAScript 2026 — Module Environment Record GetThisBinding",
+      "url": "https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-module-environment-records-getthisbinding",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["method-receiver", "this-binding"]
+    },
+    {
+      "id": "ecma-for-in-enumeration",
+      "title": "ECMAScript 2026 — for-in and for-of Statements",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-for-in-and-for-of-statements",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["prototype-pollution"]
+    },
+    {
+      "id": "ecma-evaluate-call",
+      "title": "ECMAScript 2026 — EvaluateCall and receiver selection",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-evaluatecall",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["method-receiver", "this-binding"]
+    },
+    {
+      "id": "ecma2026-function-call",
+      "title": "ECMAScript 2026 — Function.prototype.call",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-function.prototype.call",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["method-receiver", "this-binding"]
+    },
+    {
+      "id": "owasp-prototype-pollution",
+      "title": "OWASP Prototype Pollution Prevention Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Prototype_Pollution_Prevention_Cheat_Sheet.html",
+      "kind": "security-guidance",
+      "checkedAt": "2026-09-07",
+      "supports": ["prototype-pollution"]
+    },
+    {
+      "id": "owasp-input-validation",
+      "title": "OWASP Input Validation Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+      "kind": "security-guidance",
+      "checkedAt": "2026-09-07",
+      "supports": ["plugin-contract"]
+    },
+    {
+      "id": "ecma-execution-contexts",
+      "title": "ECMAScript Language Specification — Executable Code and Execution Contexts",
+      "url": "https://tc39.es/ecma262/multipage/executable-code-and-execution-contexts.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "execution-contexts",
+        "lexical-environments",
+        "closure-lifetime",
+        "this-binding",
+        "function-wrappers"
+      ]
+    },
+    {
+      "id": "ecma-reflection",
+      "title": "ECMAScript Language Specification — Reflection",
+      "url": "https://tc39.es/ecma262/multipage/reflection.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "reflect-operations",
+        "revocable-proxies",
+        "metaprogramming-boundaries"
+      ]
+    },
+    {
+      "id": "ecma-symbols",
+      "title": "ECMAScript 2026 — Symbol type, registry and well-known symbols",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-symbol-objects",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["symbols"]
+    },
+    {
+      "id": "ecma-proxy-invariants",
+      "title": "ECMAScript 2026 — Proxy object internal methods and invariants",
+      "url": "https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["proxy-invariants"]
+    },
+    {
+      "id": "ecma-iteration",
+      "title": "ECMAScript Language Specification — Control Abstraction Objects",
+      "url": "https://tc39.es/ecma262/multipage/control-abstraction-objects.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "iterator-protocol",
+        "generator-protocol",
+        "generator-delegation",
+        "generator-control",
+        "lazy-pipelines",
+        "async-iterator-protocol",
+        "async-generators",
+        "for-await"
+      ]
+    },
+    {
+      "id": "mdn-generator-function",
+      "title": "MDN JavaScript Reference — function*",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*",
+      "kind": "compatibility-data",
+      "checkedAt": "2026-09-07",
+      "supports": ["generator-protocol"]
+    },
+    {
+      "id": "ecma-promises",
+      "title": "ECMAScript Language Specification — Promise Objects",
+      "url": "https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-promise-objects",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "promise-resolution",
+        "async-error-topology",
+        "promise-combinators"
+      ]
+    },
+    {
+      "id": "ecma-error-objects",
+      "title": "ECMAScript Language Specification — Error Objects",
+      "url": "https://tc39.es/ecma262/multipage/fundamental-objects.html#sec-error-objects",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["async-error-topology"]
+    },
+    {
+      "id": "dom-abort",
+      "title": "DOM Standard — Aborting ongoing activities",
+      "url": "https://dom.spec.whatwg.org/#aborting-ongoing-activities",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "abort-signals",
+        "structured-async-lifetime",
+        "plugin-lifecycle",
+        "plugin-contract"
+      ]
+    },
+    {
+      "id": "streams-standard",
+      "title": "Streams Standard",
+      "url": "https://streams.spec.whatwg.org/",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "stream-backpressure",
+        "cancellable-pipelines",
+        "plugin-backpressure"
+      ]
+    },
+    {
+      "id": "ecma-keyed-collections",
+      "title": "ECMAScript Language Specification — Keyed Collections",
+      "url": "https://tc39.es/ecma262/multipage/keyed-collections.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["keyed-collections", "weak-collections"]
+    },
+    {
+      "id": "ecma-structured-data",
+      "title": "ECMAScript Language Specification — Structured Data",
+      "url": "https://tc39.es/ecma262/multipage/structured-data.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["binary-data", "shared-memory-atomics"]
+    },
+    {
+      "id": "unicode-normalization",
+      "title": "Unicode Standard Annex #15 — Unicode Normalization Forms",
+      "url": "https://www.unicode.org/reports/tr15/",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["unicode-text"]
+    },
+    {
+      "id": "mdn-memory-management",
+      "title": "MDN JavaScript Guide — Memory management",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Memory_management",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["reachability", "weak-references"]
+    },
+    {
+      "id": "node-heap-snapshot",
+      "title": "Node.js Diagnostics — Using Heap Snapshot",
+      "url": "https://nodejs.org/en/learn/diagnostics/memory/using-heap-snapshot",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["heap-snapshots", "leak-diagnostics", "plugin-diagnostics"]
+    },
+    {
+      "id": "html-workers",
+      "title": "HTML Standard — Web workers",
+      "url": "https://html.spec.whatwg.org/multipage/workers.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["worker-message-passing", "plugin-worker-boundary"]
+    },
+    {
+      "id": "html-structured-data",
+      "title": "HTML Standard — Safe passing of structured data",
+      "url": "https://html.spec.whatwg.org/multipage/structured-data.html",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["structured-clone-transfer", "shared-memory-atomics"]
+    },
+    {
+      "id": "ecma-modules",
+      "title": "ECMAScript Language Specification — Modules",
+      "url": "https://tc39.es/ecma262/multipage/ecmascript-language-scripts-and-modules.html#sec-modules",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["esm-live-bindings", "esm-cycles"]
+    },
+    {
+      "id": "ecma2026-import-calls",
+      "title": "ECMAScript 2026 — Import Calls",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-import-calls",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["dynamic-import-boundaries", "plugin-loader"]
+    },
+    {
+      "id": "html-module-scripts",
+      "title": "HTML Standard — JavaScript modules",
+      "url": "https://html.spec.whatwg.org/multipage/webappapis.html#integration-with-the-javascript-module-system",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["browser-module-resolution"]
+    },
+    {
+      "id": "node-packages",
+      "title": "Node.js Documentation — Modules: Packages",
+      "url": "https://nodejs.org/api/packages.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "node-package-resolution",
+        "cjs-esm-interop",
+        "dynamic-import-boundaries",
+        "package-contract",
+        "plugin-package-surface",
+        "plugin-loader"
+      ]
+    },
+    {
+      "id": "rollup-documentation",
+      "title": "Rollup Documentation",
+      "url": "https://rollupjs.org/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["rollup-build", "tree-shaking"]
+    },
+    {
+      "id": "rollup-load-hook",
+      "title": "Rollup Plugin Development — load hook and SourceDescription",
+      "url": "https://rollupjs.org/plugin-development/#load",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-08",
+      "supports": ["rollup-build", "source-map-fidelity"]
+    },
+    {
+      "id": "pnpm-pack-v10",
+      "title": "pnpm 10.x Documentation — pnpm pack",
+      "url": "https://pnpm.io/10.x/cli/pack",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["packed-consumer-testing"]
+    },
+    {
+      "id": "npm-package-files",
+      "title": "npm CLI v11 — package.json files and always-included files",
+      "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json#files",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["package-contract", "packed-consumer-testing"]
+    },
+    {
+      "id": "tc39-finished-proposals",
+      "title": "TC39 Finished Proposals",
+      "url": "https://github.com/tc39/proposals/blob/main/finished-proposals.md",
+      "kind": "proposal",
+      "checkedAt": "2026-09-07",
+      "supports": ["recent-builtins-2023-2026", "proposal-lifecycle"]
+    },
+    {
+      "id": "ecma2026-array-tosorted",
+      "title": "ECMAScript 2026 — Array.prototype.toSorted",
+      "url": "https://tc39.es/ecma262/2026/multipage/indexed-collections.html#sec-array.prototype.tosorted",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["recent-builtins-2023-2026"]
+    },
+    {
+      "id": "ecma2026-object-groupby",
+      "title": "ECMAScript 2026 — Object.groupBy",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-object.groupby",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["recent-builtins-2023-2026"]
+    },
+    {
+      "id": "ecma2026-set-union",
+      "title": "ECMAScript 2026 — Set.prototype.union",
+      "url": "https://tc39.es/ecma262/2026/multipage/keyed-collections.html#sec-set.prototype.union",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["recent-builtins-2023-2026"]
+    },
+    {
+      "id": "tc39-process",
+      "title": "TC39 Process Document",
+      "url": "https://tc39.es/process-document/",
+      "kind": "proposal",
+      "checkedAt": "2026-09-07",
+      "supports": ["proposal-lifecycle"]
+    },
+    {
+      "id": "mdn-uint8array-base64-compatibility",
+      "title": "MDN — Uint8Array.fromBase64 compatibility data",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64#browser_compatibility",
+      "kind": "compatibility-data",
+      "checkedAt": "2026-09-07",
+      "supports": ["feature-availability-matrix"]
+    },
+    {
+      "id": "html-event-loops",
+      "title": "HTML Standard — Event loops",
+      "url": "https://html.spec.whatwg.org/multipage/webappapis.html#event-loops",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "browser-task-queues",
+        "browser-microtasks",
+        "rendering-opportunities",
+        "timer-scheduling",
+        "browser-starvation",
+        "shared-memory-atomics"
+      ]
+    },
+    {
+      "id": "node-event-loop-guide",
+      "title": "Node.js — The Node.js Event Loop",
+      "url": "https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "node-event-loop-phases",
+        "node-nexttick-microtasks",
+        "node-timers-immediates",
+        "node-io-liveness"
+      ]
+    },
+    {
+      "id": "node-timers",
+      "title": "Node.js 24.20.0 — Timers",
+      "url": "https://nodejs.org/docs/v24.20.0/api/timers.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["node-timers-immediates", "node-io-liveness"]
+    },
+    {
+      "id": "node26-timers",
+      "title": "Node.js 26.8.1 — Timers",
+      "url": "https://nodejs.org/docs/v26.8.1/api/timers.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["node-timers-immediates", "node-io-liveness", "node-version-compatibility"]
+    },
+    {
+      "id": "node-release-schedule",
+      "title": "Node.js Releases",
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "kind": "compatibility-data",
+      "checkedAt": "2026-09-07",
+      "supports": ["node-version-compatibility", "plugin-consumer-matrix"]
+    },
+    {
+      "id": "node-typescript",
+      "title": "Node.js Documentation — Modules: TypeScript",
+      "url": "https://nodejs.org/api/typescript.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["package-contract", "plugin-package-surface"]
+    },
+    {
+      "id": "playwright-browsers",
+      "title": "Playwright Documentation — Browsers",
+      "url": "https://playwright.dev/docs/browsers",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-08",
+      "supports": [
+        "abort-signals",
+        "stream-backpressure",
+        "feature-availability-matrix",
+        "browser-task-queues",
+        "browser-microtasks",
+        "rendering-opportunities",
+        "timer-scheduling",
+        "browser-starvation",
+        "plugin-consumer-matrix"
+      ]
+    },
+    {
+      "id": "npm-organizations",
+      "title": "npm Documentation — Organizations",
+      "url": "https://docs.npmjs.com/organizations/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["npm-first-publication"]
+    },
+    {
+      "id": "npm-trusted-publishers",
+      "title": "npm Documentation — Trusted publishing",
+      "url": "https://docs.npmjs.com/trusted-publishers/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["trusted-publishing-provenance"]
+    },
+    {
+      "id": "ecma-bound-functions",
+      "title": "ECMAScript 2026 — Function.prototype.bind and Bound Function Exotic Objects",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-function.prototype.bind",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["function-wrappers", "method-receiver", "this-binding"]
+    },
+    {
+      "id": "ecma2026-function-apply",
+      "title": "ECMAScript 2026 — Function.prototype.apply",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-function.prototype.apply",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["constructor-protocol"]
+    },
+    {
+      "id": "ecma2026-function-instances-prototype",
+      "title": "ECMAScript 2026 — Function instances prototype property",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-function-instances-prototype",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["constructor-protocol"]
+    },
+    {
+      "id": "ecma2026-evaluate-new",
+      "title": "ECMAScript 2026 — EvaluateNew",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-evaluate-new",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["constructor-protocol"]
+    },
+    {
+      "id": "ecma2026-object-create",
+      "title": "ECMAScript 2026 — Object.create",
+      "url": "https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-object.create",
+      "kind": "standard",
+      "checkedAt": "2026-09-08",
+      "supports": ["constructor-protocol"]
+    },
+    {
+      "id": "ecma-string-type",
+      "title": "ECMAScript 2026 — The String Type",
+      "url": "https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-string-type",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["unicode-text"]
+    },
+    {
+      "id": "ecma402-segmenter",
+      "title": "ECMA-402 — Segmenter Objects",
+      "url": "https://tc39.es/ecma402/2025/#segmenter-objects",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["unicode-text"]
+    },
+    {
+      "id": "ecma-weakref-processing",
+      "title": "ECMAScript 2026 — WeakRef and FinalizationRegistry Processing Model",
+      "url": "https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-processing-model-of-weakref-and-finalizationregistry-targets",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["reachability", "weak-references"]
+    },
+    {
+      "id": "node-abort-globals",
+      "title": "Node.js Documentation — AbortController and AbortSignal globals",
+      "url": "https://nodejs.org/api/globals.html#class-abortcontroller",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["abort-signals", "structured-async-lifetime", "plugin-lifecycle"]
+    },
+    {
+      "id": "node-web-streams",
+      "title": "Node.js Documentation — Web Streams API",
+      "url": "https://nodejs.org/api/webstreams.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["stream-backpressure", "cancellable-pipelines", "plugin-backpressure"]
+    },
+    {
+      "id": "node-worker-threads",
+      "title": "Node.js Documentation — worker_threads",
+      "url": "https://nodejs.org/api/worker_threads.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": [
+        "worker-message-passing",
+        "structured-clone-transfer",
+        "shared-memory-atomics",
+        "plugin-worker-boundary",
+        "plugin-contract"
+      ]
+    },
+    {
+      "id": "node-process-microtasks-resources",
+      "title": "Node.js 24.20.0 — process.nextTick, queueMicrotask and active resources",
+      "url": "https://nodejs.org/docs/v24.20.0/api/process.html#when-to-use-queuemicrotask-vs-processnexttick",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["node-nexttick-microtasks", "node-io-liveness", "plugin-diagnostics"]
+    },
+    {
+      "id": "node26-process-microtasks-resources",
+      "title": "Node.js 26.8.1 — process.nextTick, queueMicrotask and active resources",
+      "url": "https://nodejs.org/docs/v26.8.1/api/process.html#when-to-use-queuemicrotask-vs-processnexttick",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["node-nexttick-microtasks", "node-io-liveness", "node-version-compatibility", "plugin-diagnostics"]
+    },
+    {
+      "id": "node-diagnostic-report",
+      "title": "Node.js Documentation — Diagnostic report",
+      "url": "https://nodejs.org/api/report.html",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["leak-diagnostics", "plugin-diagnostics"]
+    },
+    {
+      "id": "node-esm-cjs-interop",
+      "title": "Node.js Documentation — ECMAScript modules interoperability with CommonJS",
+      "url": "https://nodejs.org/api/esm.html#interoperability-with-commonjs",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-07",
+      "supports": ["cjs-esm-interop"]
+    },
+    {
+      "id": "typescript-erasable-syntax",
+      "title": "TypeScript Documentation — erasableSyntaxOnly",
+      "url": "https://www.typescriptlang.org/tsconfig/erasableSyntaxOnly.html",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["package-contract", "plugin-package-surface"]
+    },
+    {
+      "id": "typescript-module-reference",
+      "title": "TypeScript Handbook — Modules Reference",
+      "url": "https://www.typescriptlang.org/docs/handbook/modules/reference.html",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["package-contract", "packed-consumer-testing", "plugin-package-surface"]
+    },
+    {
+      "id": "typescript-declaration-emit",
+      "title": "TypeScript Documentation — declaration and emitDeclarationOnly",
+      "url": "https://www.typescriptlang.org/tsconfig/declaration.html",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["package-contract", "rollup-build", "plugin-package-surface"]
+    },
+    {
+      "id": "typescript-sourcemap",
+      "title": "TypeScript TSConfig — sourceMap",
+      "url": "https://www.typescriptlang.org/tsconfig/sourceMap.html",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-08",
+      "supports": ["rollup-build", "source-map-fidelity"]
+    },
+    {
+      "id": "node24-enable-source-maps",
+      "title": "Node.js 24 — --enable-source-maps",
+      "url": "https://nodejs.org/download/release/latest-v24.x/docs/api/cli.html#--enable-source-maps",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["source-map-fidelity", "node-version-compatibility"]
+    },
+    {
+      "id": "chrome-devtools-source-maps",
+      "title": "Chrome DevTools — Debug original code with source maps",
+      "url": "https://developer.chrome.com/docs/devtools/javascript/source-maps",
+      "kind": "runtime-documentation",
+      "checkedAt": "2026-09-08",
+      "supports": ["source-map-fidelity"]
+    },
+    {
+      "id": "typescript-declaration-map",
+      "title": "TypeScript TSConfig — declarationMap",
+      "url": "https://www.typescriptlang.org/tsconfig/declarationMap.html",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-08",
+      "supports": ["rollup-build", "package-contract"]
+    },
+    {
+      "id": "typescript-lib-option",
+      "title": "TypeScript TSConfig — lib type-definition selection",
+      "url": "https://www.typescriptlang.org/tsconfig/lib.html",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["feature-availability-matrix"]
+    },
+    {
+      "id": "typescript-7-release",
+      "title": "Microsoft TypeScript — Announcing TypeScript 7.0",
+      "url": "https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-08",
+      "supports": ["feature-availability-matrix", "rollup-build"]
+    },
+    {
+      "id": "typescript-7-package",
+      "title": "npm registry package — typescript 7.0.2",
+      "url": "https://www.npmjs.com/package/typescript/v/7.0.2",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["feature-availability-matrix"]
+    },
+    {
+      "id": "html-timers",
+      "title": "HTML Standard — Timers",
+      "url": "https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timers",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["timer-scheduling"]
+    },
+    {
+      "id": "ecma2026-uint8array-base64",
+      "title": "ECMAScript 2026 — Uint8Array Base64 and hex methods",
+      "url": "https://tc39.es/ecma262/2026/multipage/indexed-collections.html#sec-uint8array-objects",
+      "kind": "standard",
+      "checkedAt": "2026-09-07",
+      "supports": ["es2026-uint8array-base64", "feature-availability-matrix"]
+    },
+    {
+      "id": "npm-public-scoped-package",
+      "title": "npm Documentation — Creating and publishing scoped public packages",
+      "url": "https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["npm-first-publication"]
+    },
+    {
+      "id": "npm-publish-tarball",
+      "title": "npm CLI v11 — npm publish",
+      "url": "https://docs.npmjs.com/cli/v11/commands/npm-publish/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-08",
+      "supports": ["npm-first-publication", "trusted-publishing-provenance"]
+    },
+    {
+      "id": "npm-provenance",
+      "title": "npm Documentation — Generating provenance statements",
+      "url": "https://docs.npmjs.com/generating-provenance-statements/",
+      "kind": "other-primary",
+      "checkedAt": "2026-09-07",
+      "supports": ["trusted-publishing-provenance"]
     }
   ]
 }
